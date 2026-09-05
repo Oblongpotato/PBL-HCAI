@@ -56,3 +56,9 @@
 .p2 .candidates summary { cursor: pointer; color: #275CB2; }
 .p2 .candidates table { margin-top: 8px; }
 .p2 tr.chosen { background: #eef3ff; font-weight: 600; }
+
+.p2 tr.original { background: #f7f7f7; }
+.p2 td.changed { background: #fff6e0; }
+.p2 td.changed .delta { color: #a06a00; font-size: 0.75rem; display: block; }
+.p2 td.empty { color: #666; font-style: italic; text-align: center; padding: 14px; }
+.p2 .selector select, .p2 .selector input[type="number"] { padding: 5px; font-size: 0.9rem; }

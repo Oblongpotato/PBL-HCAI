@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from . import data, plots, training
+from . import counterfactuals, data, plots, training
 
 
 def _selection(request):
@@ -16,6 +16,32 @@ def _selection(request):
     lam = min(max(lam, 0.0), training.LAMBDA_MAX)
 
     return family, round(lam, 4)
+
+
+def _counterfactual_context(request, pipeline):
+    """Section 4, driven by the same model the sections above are showing."""
+    frame = data.load()
+    try:
+        row = int(request.GET.get("row", 0))
+    except (TypeError, ValueError):
+        row = 0
+    index, x = data.example(row)
+
+    predicted = pipeline.predict(frame.iloc[[index]][data.FEATURES])[0]
+    target = request.GET.get("target")
+    if target not in data.species():
+        target = next(name for name in data.species() if name != predicted)
+
+    found = counterfactuals.generate(pipeline, x, target)
+    return {
+        "row": index,
+        "species": data.species(),
+        "features": data.FEATURES,
+        "target": target,
+        "predicted": predicted,
+        "original_cells": [x[feature] for feature in data.FEATURES],
+        "counterfactuals": counterfactuals.as_rows(x, found),
+    }
 
 
 def index(request):
@@ -46,6 +72,8 @@ def index(request):
             for entry in sorted(training.pool(family), key=lambda e: e["complexity"])
         ],
     }
+
+    context.update(_counterfactual_context(request, selected["pipeline"]))
 
     if family == "tree":
         context["model_plot"] = plots.decision_tree(selected["pipeline"])
