@@ -51,3 +51,8 @@
 .p2 .selector input[type="range"] { width: 100%; }
 .p2 .range-ends { display: flex; justify-content: space-between; color: #888; font-size: 0.75rem; }
 .p2 .objective { background: #f6f8fc; border-left: 4px solid #275CB2; padding: 8px 14px; font-size: 0.9rem; }
+
+.p2 .candidates { margin: 12px 0; font-size: 0.9rem; }
+.p2 .candidates summary { cursor: pointer; color: #275CB2; }
+.p2 .candidates table { margin-top: 8px; }
+.p2 tr.chosen { background: #eef3ff; font-weight: 600; }

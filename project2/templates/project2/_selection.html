@@ -41,6 +41,30 @@
         <strong>{{ objective|floatformat:4 }}</strong>
     </p>
 
+    <details class="candidates">
+        <summary>All {{ candidates|length }} candidate models</summary>
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>{{ fit_regulariser }}</th><th>&Omega;(f)</th>
+                        <th>test accuracy</th><th>accuracy &minus; &lambda;&Omega;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for candidate in candidates %}
+                        <tr class="{% if candidate.chosen %}chosen{% endif %}">
+                            <td>{{ candidate.value }}</td>
+                            <td>{{ candidate.complexity }}</td>
+                            <td>{{ candidate.accuracy|floatformat:4 }}</td>
+                            <td>{{ candidate.objective|floatformat:4 }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </details>
+
     <figure class="plot">
         <img src="{{ tradeoff_plot }}" alt="Accuracy against complexity">
         <figcaption>

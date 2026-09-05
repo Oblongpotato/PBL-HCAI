@@ -35,6 +35,16 @@ def index(request):
         "fit_regulariser": training.FIT_REGULARISER[family],
         "objective": training.objective(selected, lam),
         "tradeoff_plot": plots.tradeoff(family, lam, selected),
+        "candidates": [
+            {
+                "value": entry["value"],
+                "complexity": entry["complexity"],
+                "accuracy": entry["accuracy"],
+                "objective": training.objective(entry, lam),
+                "chosen": entry["value"] == selected["value"],
+            }
+            for entry in sorted(training.pool(family), key=lambda e: e["complexity"])
+        ],
     }
 
     if family == "tree":

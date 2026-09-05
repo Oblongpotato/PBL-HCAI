@@ -6,12 +6,21 @@
         <dt>Fitted with</dt><dd><code>{{ fit_regulariser }} = {{ selected.value }}</code></dd>
         <dt>Complexity &Omega;(f)</dt><dd>{{ selected.complexity }} {{ complexity_label }}</dd>
         <dt>Test accuracy</dt><dd><strong>{{ selected.accuracy|floatformat:4 }}</strong></dd>
+        {% if used_features %}
+            <dt>Features used</dt><dd>{{ used_features|join:", " }}</dd>
+        {% endif %}
     </dl>
 
     <figure class="plot">
         <img src="{{ model_plot }}" alt="The selected model">
         <figcaption>
-            The model is the explanation: every prediction is the path from the root to a leaf.
+            {% if family == "tree" %}
+                The model is the explanation: every prediction is the path from the root to a leaf,
+                and the thresholds are in the original units.
+            {% else %}
+                One weight per feature and class. An L1 penalty drives the unused features to
+                exactly zero, which is what &Omega;(f) counts; those features are omitted here.
+            {% endif %}
         </figcaption>
     </figure>
 </section>

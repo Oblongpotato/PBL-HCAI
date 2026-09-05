@@ -27,7 +27,7 @@ COMPLEXITY_LABEL = {"tree": "leaves", "logistic": "features used"}
 FIT_REGULARISER = {"tree": "max_leaf_nodes", "logistic": "C"}
 
 LEAF_GRID = [2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30]
-C_GRID = [round(value, 5) for value in np.logspace(-3, 2, 12)]
+C_GRID = [round(value, 5) for value in np.logspace(-2.5, 1.5, 24)]
 
 ZERO = 1e-6
 LAMBDA_MAX = 0.05
