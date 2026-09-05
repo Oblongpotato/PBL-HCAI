@@ -27,6 +27,10 @@
         <button type="submit">Train</button>
     </form>
 
+    {% if training_error %}
+        <p class="training-error">{{ training_error }}</p>
+    {% endif %}
+
     {% if result %}
         <div class="result">
             <h3>
