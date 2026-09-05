@@ -2,7 +2,8 @@ from django.shortcuts import redirect, render
 
 from utils import datasets
 
-from .forms import DatasetUploadForm
+from . import plots
+from .forms import DatasetUploadForm, VisualizationForm
 from .models import Dataset
 
 SESSION_KEY = "project1_dataset"
@@ -14,7 +15,7 @@ def _current_dataset(request):
 
 
 def _store(request, upload, task_override):
-    """Validate, describe and persist an uploaded CSV. Returns (dataset, summary)."""
+    """Validate, describe and persist an uploaded CSV."""
     frame = datasets.read_csv(upload)
     frame, dropped = datasets.drop_id_columns(frame)
     summary = datasets.describe(frame, dropped)
@@ -33,15 +34,16 @@ def _store(request, upload, task_override):
     return dataset
 
 
-def _context(dataset, **extra):
-    """Shared page context: everything the interface needs about the active dataset."""
+def _context(dataset, frame=None, **extra):
+    """Page context: everything the interface shows about the active dataset."""
     context = {"dataset": dataset, "upload_form": DatasetUploadForm()}
     if dataset:
-        frame = dataset.load()
+        frame = dataset.load() if frame is None else frame
         summary = datasets.describe(frame, dataset.dropped_columns)
         summary["task"] = dataset.task
         context["summary"] = summary
         context["warnings"] = datasets.quality_warnings(frame, dataset.task)
+        context.setdefault("visualization_form", VisualizationForm(summary["numeric_features"]))
     context.update(extra)
     return context
 
@@ -52,21 +54,40 @@ def index(request):
         return render(request, "project1/index.html", _context(_current_dataset(request)))
 
     form = DatasetUploadForm(request.POST, request.FILES)
-    if not form.is_valid():
-        return render(
-            request,
-            "project1/index.html",
-            _context(_current_dataset(request), upload_form=form),
-        )
+    if form.is_valid():
+        try:
+            _store(request, request.FILES["file"], form.cleaned_data["task"])
+            return redirect("project1:index")
+        except ValueError as error:
+            form.add_error("file", str(error))
 
-    try:
-        _store(request, request.FILES["file"], form.cleaned_data["task"])
-    except ValueError as error:
-        form.add_error("file", str(error))
-        return render(
-            request,
-            "project1/index.html",
-            _context(_current_dataset(request), upload_form=form),
-        )
+    return render(request, "project1/index.html", _context(_current_dataset(request), upload_form=form))
 
-    return redirect("project1:index")
+
+def visualize(request):
+    """Render one plot of the loaded dataset, chosen by the user."""
+    dataset = _current_dataset(request)
+    if dataset is None or request.method != "POST":
+        return redirect("project1:index")
+
+    frame = dataset.load()
+    numeric = datasets.describe(frame, dataset.dropped_columns)["numeric_features"]
+    form = VisualizationForm(numeric, request.POST)
+
+    plot = None
+    if form.is_valid():
+        url, caption = plots.build(
+            frame,
+            dataset.target,
+            dataset.task,
+            form.cleaned_data["kind"],
+            form.cleaned_data["x"],
+            form.cleaned_data["y"],
+        )
+        plot = {"url": url, "caption": caption}
+
+    return render(
+        request,
+        "project1/index.html",
+        _context(dataset, frame=frame, visualization_form=form, plot=plot),
+    )

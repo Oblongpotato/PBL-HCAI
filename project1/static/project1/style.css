@@ -34,3 +34,10 @@
 .p1 table.preview th { background: #f4f4f4; }
 
 .p1 .back { margin-top: 24px; font-size: 0.9rem; }
+
+.p1 .inline-form p { display: inline-block; margin: 0 18px 10px 0; vertical-align: top; }
+.p1 .inline-form label { display: block; font-size: 0.85rem; color: #555; }
+
+.p1 .plot { margin: 14px 0 0; text-align: center; }
+.p1 .plot img { max-width: 100%; border: 1px solid #e2e2e2; border-radius: 4px; }
+.p1 .plot figcaption { color: #666; font-size: 0.85rem; margin-top: 6px; }
