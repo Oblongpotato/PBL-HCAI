@@ -62,3 +62,7 @@
 .p2 td.changed .delta { color: #a06a00; font-size: 0.75rem; display: block; }
 .p2 td.empty { color: #666; font-style: italic; text-align: center; padding: 14px; }
 .p2 .selector select, .p2 .selector input[type="number"] { padding: 5px; font-size: 0.9rem; }
+
+.p2 .effects { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; }
+.p2 .effects figcaption { text-align: left; }
+.p2 .derivative-note { background: #f6f8fc; border-left: 4px solid #275CB2; padding: 10px 14px; font-size: 0.88rem; }

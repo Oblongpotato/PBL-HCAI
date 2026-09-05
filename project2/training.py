@@ -49,8 +49,9 @@ def _preprocessor(family):
 def _estimator(family, value):
     if family == "tree":
         return DecisionTreeClassifier(max_leaf_nodes=int(value), random_state=data.SEED)
-    # An L1 penalty is what makes "number of features used" a meaningful complexity measure.
-    return LogisticRegression(penalty="l1", solver="saga", C=value, max_iter=5000)
+    # l1_ratio=1 is a pure L1 penalty, which is what drives coefficients to exactly zero
+    # and makes "number of features used" a meaningful complexity measure.
+    return LogisticRegression(solver="saga", l1_ratio=1, C=value, max_iter=5000)
 
 
 def grid(family):

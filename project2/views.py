@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from . import counterfactuals, data, plots, training
+from . import counterfactuals, data, effects, plots, training
 
 
 def _selection(request):
@@ -44,6 +44,32 @@ def _counterfactual_context(request, pipeline):
     }
 
 
+def _effects_context(request, pipeline):
+    """Section 5, on the same model again."""
+    feature = request.GET.get("feature")
+    if feature not in data.NUMERIC_FEATURES:
+        feature = data.NUMERIC_FEATURES[0]
+
+    grid = effects.grid_for(feature)
+    pdp_plot = plots.effect_curves(
+        grid, effects.pdp(pipeline, feature, grid), feature,
+        f"Partial dependence on {feature}",
+    )
+
+    edges, finite = effects.ale_finite(pipeline, feature)
+    exact_edges, exact = effects.ale_exact(pipeline, feature)
+    ale_plot = plots.effect_curves(
+        edges, finite, feature, f"Accumulated local effects of {feature}", extra=exact,
+    )
+
+    return {
+        "feature": feature,
+        "pdp_plot": pdp_plot,
+        "ale_plot": ale_plot,
+        "exact_available": exact is not None,
+    }
+
+
 def index(request):
     """One page: the model selected here drives everything shown below it."""
     family, lam = _selection(request)
@@ -74,6 +100,7 @@ def index(request):
     }
 
     context.update(_counterfactual_context(request, selected["pipeline"]))
+    context.update(_effects_context(request, selected["pipeline"]))
 
     if family == "tree":
         context["model_plot"] = plots.decision_tree(selected["pipeline"])
