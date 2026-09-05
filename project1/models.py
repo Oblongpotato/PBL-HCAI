@@ -1,6 +1,19 @@
+import uuid
+
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 from django.db import models
 
 from utils import datasets
+
+# Uploads live outside MEDIA_ROOT: that directory is served publicly by pbl/urls.py,
+# while a dataset belongs to the session that uploaded it.
+private_storage = FileSystemStorage(location=settings.BASE_DIR / "private_uploads")
+
+
+def upload_path(instance, filename):
+    """Discard the caller's filename; it is displayed from Dataset.name instead."""
+    return f"{uuid.uuid4().hex}.csv"
 
 TASK_CHOICES = [("classification", "Classification"), ("regression", "Regression")]
 
@@ -9,7 +22,7 @@ class Dataset(models.Model):
     """A CSV uploaded by the user, kept so visualisation and training can reuse it."""
 
     name = models.CharField(max_length=200)
-    file = models.FileField(upload_to="uploads/")
+    file = models.FileField(upload_to=upload_path, storage=private_storage)
     target = models.CharField(max_length=200)
     task = models.CharField(max_length=20, choices=TASK_CHOICES)
     n_rows = models.PositiveIntegerField()

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from django.shortcuts import redirect, render
 
 from utils import datasets
@@ -11,8 +13,12 @@ _TRAINING_FAILED = "This dataset could not be trained on: {error}"
 
 
 def _current_dataset(request):
-    """The dataset the user is working on, or None."""
-    return Dataset.objects.filter(pk=request.session.get(SESSION_KEY)).first()
+    """The dataset the user is working on, or None if it is gone from disk."""
+    dataset = Dataset.objects.filter(pk=request.session.get(SESSION_KEY)).first()
+    if dataset and not Path(dataset.file.path).exists():
+        request.session.pop(SESSION_KEY, None)
+        return None
+    return dataset
 
 
 def _store(request, upload, task_override):

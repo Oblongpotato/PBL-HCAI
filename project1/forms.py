@@ -1,4 +1,5 @@
 from django import forms
+from django.core.validators import FileExtensionValidator
 
 from . import ml, plots
 from .models import TASK_CHOICES
@@ -7,7 +8,10 @@ from .models import TASK_CHOICES
 class DatasetUploadForm(forms.Form):
     """Upload a CSV whose first row holds feature names and last column the target."""
 
-    file = forms.FileField(label="CSV file")
+    file = forms.FileField(
+        label="CSV file",
+        validators=[FileExtensionValidator(allowed_extensions=["csv"])],
+    )
     task = forms.ChoiceField(
         label="Problem type",
         required=False,
