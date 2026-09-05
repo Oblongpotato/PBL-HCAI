@@ -54,6 +54,7 @@ class TrainingRun(models.Model):
     random_state = models.IntegerField()
     scoring = models.CharField(max_length=30)
     best_value = models.FloatField()
+    selection_score = models.FloatField(default=0.0)
     best_score = models.FloatField()
     automated = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -4,6 +4,8 @@ from django.core.validators import FileExtensionValidator
 from . import ml, plots
 from .models import TASK_CHOICES
 
+TREE_BUDGET = 500
+
 
 class DatasetUploadForm(forms.Form):
     """Upload a CSV whose first row holds feature names and last column the target."""
@@ -82,6 +84,12 @@ class TrainingForm(forms.Form):
             self.add_error("values", f"{spec['hyperparameter']} must be a list of positive numbers.")
         elif len(grid) > 20:
             self.add_error("values", "Twenty values at most, to keep training responsive.")
+        elif spec["hyperparameter"] == "n_estimators" and sum(grid) > TREE_BUDGET:
+            self.add_error(
+                "values",
+                f"That sweep would fit {sum(grid)} trees per fold. Keep the total under "
+                f"{TREE_BUDGET} so the page stays responsive.",
+            )
         else:
             cleaned["grid"] = sorted(dict.fromkeys(grid))
         return cleaned

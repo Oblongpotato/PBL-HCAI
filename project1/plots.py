@@ -82,12 +82,14 @@ def build(frame, target, task, kind, x=None, y=None):
     return save_figure(fig, f"p1-{kind}"), caption
 
 
-def score_curve(values, scores, hyperparameter, score_label, best_value):
-    """Score against hyperparameter: the curve the lecture uses to pick a value."""
+def score_curve(values, scores, hyperparameter, score_label, best_value, test_score):
+    """Selection score against hyperparameter, with the untouched test score marked."""
     fig, ax = _axes(f"{score_label} against {hyperparameter}", hyperparameter, score_label)
-    ax.plot(range(len(values)), scores, marker="o")
+    ax.plot(range(len(values)), scores, marker="o", label="cross-validation (training set)")
     ax.set_xticks(range(len(values)), [str(value) for value in values])
     ax.axvline(values.index(best_value), color="tab:red", linestyle="--", linewidth=1, label="selected")
+    ax.plot([values.index(best_value)], [test_score], marker="*", markersize=14,
+            color="tab:green", linestyle="none", label="test score of the selected model")
     ax.legend(fontsize=8)
     ax.grid(alpha=0.3)
     return save_figure(fig, "p1-curve")

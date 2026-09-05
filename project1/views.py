@@ -147,12 +147,13 @@ def _sweep(dataset, frame, model_key, values, test_size, random_state, scoring, 
         random_state=random_state,
         scoring=scoring,
         best_value=result["best_value"],
+        selection_score=result["selection_score"],
         best_score=result["best_score"],
         automated=automated,
     )
     result["curve"] = plots.score_curve(result["values"], result["scores"],
                                         result["hyperparameter"], result["score_label"],
-                                        result["best_value"])
+                                        result["best_value"], result["best_score"])
     result["automated"] = automated
     return result
 

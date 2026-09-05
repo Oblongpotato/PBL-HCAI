@@ -39,9 +39,18 @@
                 {% else %}<span class="tag">your settings</span>{% endif %}
             </h3>
             <p>
-                Best <code>{{ result.hyperparameter }}</code> = <strong>{{ result.best_value }}</strong>
-                with {{ result.score_label }} = <strong>{{ result.best_score|floatformat:4 }}</strong>,
-                trained on {{ result.n_train }} rows and tested on {{ result.n_test }}.
+                Best <code>{{ result.hyperparameter }}</code> = <strong>{{ result.best_value }}</strong>,
+                chosen by {{ result.n_folds }}-fold cross-validation on the {{ result.n_train }}
+                training rows ({{ result.score_label }} = {{ result.selection_score|floatformat:4 }}).
+            </p>
+            <p class="headline">
+                {{ result.score_label }} on the {{ result.n_test }} held-out test rows:
+                <strong>{{ result.best_score|floatformat:4 }}</strong>
+            </p>
+            <p class="hint">
+                The test set played no part in choosing the hyperparameter, so this number is not
+                inflated by the search. A large gap between the two means the search overfitted the
+                training data.
             </p>
 
             <figure class="plot">
