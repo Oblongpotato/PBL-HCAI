@@ -1,0 +1,41 @@
+<section class="panel">
+    <h2>5. Automation, and what it costs you</h2>
+
+    <p class="hint">
+        Fully automated machine learning removes the tedious work, but it also removes the user
+        from the decisions: model, split and score are picked without asking. Run it here and
+        compare it against your own configuration in the table below.
+    </p>
+
+    <form method="post" action="{% url 'project1:automl' %}">
+        {% csrf_token %}
+        <button type="submit">Let the app decide everything</button>
+    </form>
+
+    {% if history %}
+        <h3>Run history</h3>
+        <div class="table-scroll">
+            <table class="history">
+                <thead>
+                    <tr>
+                        <th>When</th><th>Decided by</th><th>Model</th><th>Best</th>
+                        <th>Score</th><th>Test fraction</th><th>Seed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for run in history %}
+                        <tr class="{% if run.automated %}auto-row{% endif %}">
+                            <td>{{ run.created_at|date:"H:i:s" }}</td>
+                            <td>{% if run.automated %}the app{% else %}you{% endif %}</td>
+                            <td>{{ run.model_key }}</td>
+                            <td>{{ run.hyperparameter }} = {{ run.best_value|floatformat:"-3" }}</td>
+                            <td>{{ run.scoring }} {{ run.best_score|floatformat:4 }}</td>
+                            <td>{{ run.test_size }}</td>
+                            <td>{{ run.random_state }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</section>

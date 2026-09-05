@@ -139,3 +139,16 @@ def _sweep(dataset, frame, model_key, values, test_size, random_state, scoring, 
                                         result["best_value"])
     result["automated"] = automated
     return result
+
+
+def automl(request):
+    """Run the same pipeline with no user input, to expose what automation costs."""
+    dataset = _current_dataset(request)
+    if dataset is None or request.method != "POST":
+        return redirect("project1:index")
+
+    frame = dataset.load()
+    choice = ml.automatic_choice(dataset.task)
+    result = _sweep(dataset, frame, choice["model_key"], choice["values"], choice["test_size"],
+                    choice["random_state"], choice["scoring"], automated=True)
+    return render(request, "project1/index.html", _context(dataset, frame=frame, result=result))

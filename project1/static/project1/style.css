@@ -1,4 +1,17 @@
-.p1 { max-width: 980px; margin: 0 auto; }
+/* The shared .box is absolutely centred, which only works for short pages.
+   This page scrolls, so it is laid out in normal flow instead. */
+.box.p1 {
+    position: static;
+    transform: none;
+    grid-template-rows: auto;
+    width: auto;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 10px 24px 24px;
+    box-sizing: border-box;
+}
+
+.p1 button { width: auto; padding: 0 22px; font-size: 16px; height: 38px; margin: 0; }
 
 .p1 .lead { color: #444; line-height: 1.5; }
 
@@ -52,3 +65,8 @@
 .p1 .tag { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em;
            background: #eef3ff; color: #2b4c9b; border-radius: 3px; padding: 2px 6px; vertical-align: middle; }
 .p1 .tag.auto { background: #fdeeee; color: #9b2b2b; }
+
+.p1 table.history { border-collapse: collapse; font-size: 0.85rem; width: 100%; margin-top: 8px; }
+.p1 table.history th, .p1 table.history td { border: 1px solid #e2e2e2; padding: 4px 10px; text-align: left; }
+.p1 table.history th { background: #f4f4f4; }
+.p1 table.history tr.auto-row { background: #fdf6f6; }
