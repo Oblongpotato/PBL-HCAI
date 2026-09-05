@@ -34,6 +34,7 @@ def index(request):
         "complexity_label": training.COMPLEXITY_LABEL[family],
         "fit_regulariser": training.FIT_REGULARISER[family],
         "objective": training.objective(selected, lam),
+        "tradeoff_plot": plots.tradeoff(family, lam, selected),
     }
 
     if family == "tree":

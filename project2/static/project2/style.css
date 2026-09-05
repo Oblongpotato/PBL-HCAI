@@ -42,3 +42,12 @@
 .p2 th { background: #f4f4f4; }
 
 .p2 .back { margin-top: 24px; font-size: 0.9rem; }
+
+.p2 .selector { display: flex; gap: 28px; align-items: flex-start; flex-wrap: wrap; margin: 14px 0; }
+.p2 .selector .field { display: flex; flex-direction: column; gap: 4px; }
+.p2 .selector .field.grow { flex: 1 1 320px; }
+.p2 .selector label { font-size: 0.85rem; color: #555; }
+.p2 .selector label.radio { color: #222; font-size: 0.9rem; }
+.p2 .selector input[type="range"] { width: 100%; }
+.p2 .range-ends { display: flex; justify-content: space-between; color: #888; font-size: 0.75rem; }
+.p2 .objective { background: #f6f8fc; border-left: 4px solid #275CB2; padding: 8px 14px; font-size: 0.9rem; }
