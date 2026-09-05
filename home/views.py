@@ -1,31 +1,17 @@
-# from django.http import HttpResponse
+from django.shortcuts import render
 
+# Group members shown on the home page (task 1: defined in python, not in the template).
+STUDENTS = [
+    {"name": "Sahil Sajwan", "matriculation": "674409"},
+]
 
-# def index(request):
-#     return HttpResponse("Hello, world. You're at the polls index.")
-
-from django.http import HttpResponse
-from django.template import loader
+PROJECTS = [
+    {"name": "Project 1 — Supervised Learning Interface", "url_name": "project1:index"},
+    {"name": "Project 2 — Explainability", "url_name": "project2:index"},
+    {"name": "Project 3 — Active Learning for Learning-to-Defer", "url_name": "project3:index"},
+    {"name": "Project 4 — Preference Elicitation", "url_name": "project4:index"},
+]
 
 
 def index(request):
-    template = loader.get_template("home/index.html")
-    
-    
-    students = [
-        {"name": "Jane Doe", "matriculation": "123456"},
-        {"name": "John Smith", "matriculation": "654321"},
-        {"name": "Alex Johnson", "matriculation": "789012"},
-    ]
-    
-    projects = [
-        {"name": "Home", "url_name": "home:index"},
-        {"name": "Home 2", "url_name": "home:index"},
-    ]
-    
-    context = { 
-        "students": students, 
-        "projects": projects, 
-    }
-    
-    return HttpResponse(template.render(context, request))
+    return render(request, "home/index.html", {"students": STUDENTS, "projects": PROJECTS})

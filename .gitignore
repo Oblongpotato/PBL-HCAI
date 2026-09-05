@@ -176,3 +176,7 @@ cython_debug/
 # user files to ignore
 Resources
 *.md
+# Generated media
+media/plots/
+media/uploads/
+media/myplot.png
