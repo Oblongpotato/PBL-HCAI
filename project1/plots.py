@@ -80,3 +80,14 @@ def build(frame, target, task, kind, x=None, y=None):
     """Render the requested plot and return (image url, caption)."""
     fig, caption = BUILDERS[kind](frame, target, task, x, y)
     return save_figure(fig, f"p1-{kind}"), caption
+
+
+def score_curve(values, scores, hyperparameter, score_label, best_value):
+    """Score against hyperparameter: the curve the lecture uses to pick a value."""
+    fig, ax = _axes(f"{score_label} against {hyperparameter}", hyperparameter, score_label)
+    ax.plot(range(len(values)), scores, marker="o")
+    ax.set_xticks(range(len(values)), [str(value) for value in values])
+    ax.axvline(values.index(best_value), color="tab:red", linestyle="--", linewidth=1, label="selected")
+    ax.legend(fontsize=8)
+    ax.grid(alpha=0.3)
+    return save_figure(fig, "p1-curve")

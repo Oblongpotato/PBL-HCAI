@@ -1,6 +1,6 @@
 from django import forms
 
-from . import plots
+from . import ml, plots
 from .models import TASK_CHOICES
 
 
@@ -33,4 +33,51 @@ class VisualizationForm(forms.Form):
         cleaned = super().clean()
         if cleaned.get("kind") == "pair" and not cleaned.get("y"):
             self.add_error("y", "Pick a second feature for this plot.")
+        return cleaned
+
+
+class TrainingForm(forms.Form):
+    """The choices the lecture leaves to the human: model, range, split and score."""
+
+    model = forms.ChoiceField(label="Model")
+    values = forms.CharField(
+        label="Hyperparameter values",
+        required=False,
+        help_text="Comma-separated. Empty means the model's default range.",
+    )
+    test_size = forms.FloatField(label="Test fraction", min_value=0.1, max_value=0.5, initial=0.3)
+    random_state = forms.IntegerField(label="Random seed", initial=42)
+    scoring = forms.ChoiceField(label="Score")
+
+    def __init__(self, task, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["model"].choices = [(key, spec["label"]) for key, spec in ml.models_for(task).items()]
+        self.fields["scoring"].choices = [(key, spec["label"]) for key, spec in ml.scores_for(task).items()]
+
+    def clean(self):
+        cleaned = super().clean()
+        key = cleaned.get("model")
+        if not key:
+            return cleaned
+
+        spec = ml.MODELS[key]
+        raw = (cleaned.get("values") or "").strip()
+        if not raw:
+            cleaned["grid"] = spec["grid"]
+            return cleaned
+
+        try:
+            grid = [float(value) for value in raw.replace(";", ",").split(",") if value.strip()]
+        except ValueError:
+            self.add_error("values", "Use numbers separated by commas.")
+            return cleaned
+
+        if spec["integer"]:
+            grid = [int(value) for value in grid]
+        if not grid or any(value <= 0 for value in grid):
+            self.add_error("values", f"{spec['hyperparameter']} must be a list of positive numbers.")
+        elif len(grid) > 20:
+            self.add_error("values", "Twenty values at most, to keep training responsive.")
+        else:
+            cleaned["grid"] = sorted(dict.fromkeys(grid))
         return cleaned

@@ -1,0 +1,68 @@
+<section class="panel">
+    <h2>4. Train a model</h2>
+
+    <p class="hint">
+        You choose the model, the range of hyperparameter values, how much data is held out and
+        which score decides. The app handles encoding, scaling, the split and the fitting, and
+        reports what it did.
+    </p>
+
+    <table class="models">
+        <thead><tr><th>Model</th><th>Hyperparameter</th><th>Default range</th><th>Trade-off</th></tr></thead>
+        <tbody>
+            {% for spec in model_specs %}
+                <tr>
+                    <td>{{ spec.label }}</td>
+                    <td><code>{{ spec.hyperparameter }}</code></td>
+                    <td>{{ spec.grid|join:", " }}</td>
+                    <td>{{ spec.note }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <form method="post" action="{% url 'project1:train' %}" class="inline-form">
+        {% csrf_token %}
+        {{ training_form.as_p }}
+        <button type="submit">Train</button>
+    </form>
+
+    {% if result %}
+        <div class="result">
+            <h3>
+                {{ result.model_label }}
+                {% if result.automated %}<span class="tag auto">chosen automatically</span>
+                {% else %}<span class="tag">your settings</span>{% endif %}
+            </h3>
+            <p>
+                Best <code>{{ result.hyperparameter }}</code> = <strong>{{ result.best_value }}</strong>
+                with {{ result.score_label }} = <strong>{{ result.best_score|floatformat:4 }}</strong>,
+                trained on {{ result.n_train }} rows and tested on {{ result.n_test }}.
+            </p>
+
+            <figure class="plot">
+                <img src="{{ result.curve }}" alt="Score against hyperparameter">
+                <figcaption>Each point is one model. The dashed line marks the value that was kept.</figcaption>
+            </figure>
+
+            {% if result.confusion %}
+                <h4>Confusion matrix of the selected model</h4>
+                <div class="table-scroll">
+                    <table class="confusion">
+                        <thead>
+                            <tr><th>true \ predicted</th>{% for label in result.labels %}<th>{{ label }}</th>{% endfor %}</tr>
+                        </thead>
+                        <tbody>
+                            {% for label, row in result.confusion %}
+                                <tr>
+                                    <th>{{ label }}</th>
+                                    {% for cell in row %}<td>{{ cell }}</td>{% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+</section>
