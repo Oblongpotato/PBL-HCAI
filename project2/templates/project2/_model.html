@@ -1,0 +1,17 @@
+<section class="panel">
+    <h2>2. The model</h2>
+
+    <dl class="facts">
+        <dt>Model</dt><dd>{{ family_label }}</dd>
+        <dt>Fitted with</dt><dd><code>{{ fit_regulariser }} = {{ selected.value }}</code></dd>
+        <dt>Complexity &Omega;(f)</dt><dd>{{ selected.complexity }} {{ complexity_label }}</dd>
+        <dt>Test accuracy</dt><dd><strong>{{ selected.accuracy|floatformat:4 }}</strong></dd>
+    </dl>
+
+    <figure class="plot">
+        <img src="{{ model_plot }}" alt="The selected model">
+        <figcaption>
+            The model is the explanation: every prediction is the path from the root to a leaf.
+        </figcaption>
+    </figure>
+</section>

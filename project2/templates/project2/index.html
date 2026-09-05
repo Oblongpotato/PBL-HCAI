@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'project2/style.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="box p2">
+    <div class="title-container">
+        <div class="title">Project 2 &mdash; Explainability</div>
+    </div>
+
+    <p class="lead">
+        Which penguin species is it, and <em>why</em>? Pick how complex a model you are willing to
+        accept, then read the model itself.
+    </p>
+
+    {% include "project2/_dataset.html" %}
+    {% include "project2/_model.html" %}
+
+    <p class="back"><a href="{% url 'home:index' %}">&larr; Back to the project hub</a></p>
+</div>
+{% endblock %}
