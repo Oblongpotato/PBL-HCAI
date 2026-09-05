@@ -10,6 +10,8 @@ from pandas.api import types as ptypes
 ID_NAMES = {"id", "index", "unnamed: 0", "no", "sno", "s.no"}
 MAX_CLASSES = 20
 CLASS_RATIO = 0.05
+MIN_TRAINING_ROWS = 5
+MIN_ROWS_FOR_ID_GUESS = 10
 
 
 def read_csv(file):
@@ -27,14 +29,29 @@ def read_csv(file):
     return df
 
 
+def _looks_like_a_serial(column):
+    """A running index: unique integers increasing in steps of one."""
+    if not ptypes.is_integer_dtype(column) or not column.is_unique:
+        return False
+    ordered = column.sort_values()
+    return bool((ordered.diff().dropna() == 1).all())
+
+
 def drop_id_columns(df):
-    """Remove identifier-like columns. Returns the cleaned frame and the dropped names."""
+    """Remove identifier columns. Returns the cleaned frame and the dropped names.
+
+    Only names we recognise, or columns that are literally a running index, count. A
+    unique integer column is not enough on its own: salaries, counts and years are all
+    unique integers and dropping them silently destroys the dataset.
+    """
     dropped = [
         column
         for column in df.columns[:-1]
         if column.lower() in ID_NAMES
-        or (ptypes.is_integer_dtype(df[column]) and df[column].is_unique and len(df) > 2)
+        or (len(df) >= MIN_ROWS_FOR_ID_GUESS and _looks_like_a_serial(df[column]))
     ]
+    if len(dropped) == len(df.columns) - 1:
+        dropped = [column for column in dropped if column.lower() in ID_NAMES]
     return df.drop(columns=dropped), dropped
 
 
@@ -54,10 +71,13 @@ def infer_task(y):
     return "classification" if unique <= 2 else "regression"
 
 
-def describe(df, dropped=()):
-    """Summarise a dataset for display: shape, columns, missing values, target profile."""
+def describe(df, dropped=(), task=None):
+    """Summarise a dataset for display: shape, columns, missing values, target profile.
+
+    ``task`` overrides the detected one so the profile matches what the user chose.
+    """
     X, y = split_features_target(df)
-    task = infer_task(y)
+    task = task or infer_task(y)
     summary = {
         "n_rows": len(df),
         "n_features": X.shape[1],
@@ -70,10 +90,10 @@ def describe(df, dropped=()):
         "preview_columns": list(df.columns),
         "preview_rows": df.head(10).values.tolist(),
     }
-    if task == "classification":
-        summary["target_distribution"] = y.value_counts().sort_index().to_dict()
-    else:
+    if task == "regression" and ptypes.is_numeric_dtype(y):
         summary["target_range"] = (float(y.min()), float(y.max()), float(y.mean()))
+    else:
+        summary["target_distribution"] = y.value_counts().sort_index().to_dict()
     return summary
 
 
@@ -110,3 +130,37 @@ def quality_warnings(df, task):
             warnings.append("At least one class has fewer than 5 rows; the split may leave it untested.")
 
     return warnings
+
+
+def validate_trainable(df, task):
+    """Raise ValueError if this frame cannot be trained on under the requested task.
+
+    Called at upload time so an unusable dataset never reaches the training views. The
+    checks mirror what scikit-learn would otherwise raise deep inside a pipeline.
+    """
+    X, y = split_features_target(df)
+
+    if X.shape[1] == 0:
+        raise ValueError("No feature columns are left once identifier columns are removed.")
+
+    usable = len(df.dropna())
+    if usable < MIN_TRAINING_ROWS:
+        raise ValueError(
+            f"At least {MIN_TRAINING_ROWS} complete rows are needed to train and test; "
+            f"this file has {usable}."
+        )
+
+    if task == "classification":
+        if not ptypes.is_numeric_dtype(y) or ptypes.is_bool_dtype(y):
+            pass
+        elif infer_task(y) == "regression":
+            raise ValueError(
+                f"'{y.name}' holds {y.nunique()} distinct numbers and looks continuous. "
+                "Choose Regression, or use a target with a small number of classes."
+            )
+        if y.nunique(dropna=True) < 2:
+            raise ValueError(f"'{y.name}' has a single class, so there is nothing to classify.")
+    elif task == "regression" and not ptypes.is_numeric_dtype(y):
+        raise ValueError(
+            f"'{y.name}' is not numeric, so it cannot be a regression target. Choose Classification."
+        )
