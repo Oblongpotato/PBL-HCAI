@@ -1,0 +1,36 @@
+.p1 { max-width: 980px; margin: 0 auto; }
+
+.p1 .lead { color: #444; line-height: 1.5; }
+
+.p1 .panel {
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 18px 0;
+    background: #fff;
+}
+
+.p1 .panel h2 { margin-top: 0; font-size: 1.15rem; }
+
+.p1 .hint { color: #666; font-size: 0.85rem; }
+
+.p1 .facts { display: grid; grid-template-columns: max-content 1fr; gap: 4px 18px; margin: 0 0 12px; }
+.p1 .facts dt { font-weight: 600; color: #555; }
+.p1 .facts dd { margin: 0; }
+.p1 .facts .task { text-transform: capitalize; }
+
+.p1 .warnings {
+    border-left: 4px solid #e0a800;
+    background: #fff8e5;
+    padding: 10px 14px;
+    margin: 12px 0;
+    font-size: 0.9rem;
+}
+.p1 .warnings ul { margin: 6px 0 0; padding-left: 18px; }
+
+.p1 .table-scroll { overflow-x: auto; }
+.p1 table.preview { border-collapse: collapse; font-size: 0.85rem; width: 100%; }
+.p1 table.preview th, .p1 table.preview td { border: 1px solid #e2e2e2; padding: 4px 8px; text-align: left; }
+.p1 table.preview th { background: #f4f4f4; }
+
+.p1 .back { margin-top: 24px; font-size: 0.9rem; }

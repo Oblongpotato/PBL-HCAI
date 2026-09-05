@@ -16,6 +16,8 @@ def read_csv(file):
     """Read an uploaded CSV into a DataFrame, raising ValueError on unusable input."""
     try:
         df = pd.read_csv(file, skipinitialspace=True)
+    except UnicodeDecodeError as exc:
+        raise ValueError("The file is not UTF-8 text; please upload a plain CSV.") from exc
     except Exception as exc:
         raise ValueError(f"Could not parse the file as CSV: {exc}") from exc
 
@@ -65,7 +67,8 @@ def describe(df, dropped=()):
         "dropped_columns": list(dropped),
         "missing": int(df.isna().sum().sum()),
         "numeric_features": [c for c in X.columns if ptypes.is_numeric_dtype(X[c])],
-        "head": df.head(10).to_dict(orient="records"),
+        "preview_columns": list(df.columns),
+        "preview_rows": df.head(10).values.tolist(),
     }
     if task == "classification":
         summary["target_distribution"] = y.value_counts().sort_index().to_dict()
