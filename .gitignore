@@ -172,3 +172,16 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# user files to ignore
+Resources
+context.md
+instructions.md
+# Generated media
+media/plots/
+media/uploads/
+media/myplot.png
+
+# Agent tooling and private uploads
+.claude/
+private_uploads/

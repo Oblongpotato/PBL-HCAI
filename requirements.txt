@@ -1,0 +1,16 @@
+# Core web framework
+Django==5.0.4
+python-dotenv==1.0.1
+
+# Shared scientific stack (projects 1-4)
+numpy==2.5.2
+pandas==3.0.5
+matplotlib==3.11.1
+scikit-learn==1.9.0
+scipy==1.18.1
+
+# Project 2: Palmer Penguins dataset
+palmerpenguins==0.1.4
+
+# Project 3: AG News dataset
+datasets==4.0.0

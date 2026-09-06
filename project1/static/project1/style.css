@@ -1,0 +1,82 @@
+/* The shared .box is absolutely centred, which only works for short pages.
+   This page scrolls, so it is laid out in normal flow instead. */
+.box.p1 {
+    position: static;
+    transform: none;
+    grid-template-rows: auto;
+    width: auto;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 10px 24px 24px;
+    box-sizing: border-box;
+}
+
+.p1 button { width: auto; padding: 0 22px; font-size: 16px; height: 38px; margin: 0; }
+
+.p1 .lead { color: #444; line-height: 1.5; }
+
+.p1 .panel {
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 18px 0;
+    background: #fff;
+}
+
+.p1 .panel h2 { margin-top: 0; font-size: 1.15rem; }
+
+.p1 .hint { color: #666; font-size: 0.85rem; }
+
+.p1 .facts { display: grid; grid-template-columns: max-content 1fr; gap: 4px 18px; margin: 0 0 12px; }
+.p1 .facts dt { font-weight: 600; color: #555; }
+.p1 .facts dd { margin: 0; }
+.p1 .facts .task { text-transform: capitalize; }
+
+.p1 .warnings {
+    border-left: 4px solid #e0a800;
+    background: #fff8e5;
+    padding: 10px 14px;
+    margin: 12px 0;
+    font-size: 0.9rem;
+}
+.p1 .warnings ul { margin: 6px 0 0; padding-left: 18px; }
+
+.p1 .table-scroll { overflow-x: auto; }
+.p1 table.preview { border-collapse: collapse; font-size: 0.85rem; width: 100%; }
+.p1 table.preview th, .p1 table.preview td { border: 1px solid #e2e2e2; padding: 4px 8px; text-align: left; }
+.p1 table.preview th { background: #f4f4f4; }
+
+.p1 .back { margin-top: 24px; font-size: 0.9rem; }
+
+.p1 .inline-form p { display: inline-block; margin: 0 18px 10px 0; vertical-align: top; }
+.p1 .inline-form label { display: block; font-size: 0.85rem; color: #555; }
+
+.p1 .plot { margin: 14px 0 0; text-align: center; }
+.p1 .plot img { max-width: 100%; border: 1px solid #e2e2e2; border-radius: 4px; }
+.p1 .plot figcaption { color: #666; font-size: 0.85rem; margin-top: 6px; }
+
+.p1 table.models, .p1 table.confusion { border-collapse: collapse; font-size: 0.85rem; margin-bottom: 14px; }
+.p1 table.models th, .p1 table.models td,
+.p1 table.confusion th, .p1 table.confusion td { border: 1px solid #e2e2e2; padding: 4px 10px; text-align: left; }
+.p1 table.models th, .p1 table.confusion th { background: #f4f4f4; }
+
+.p1 .result { border-top: 1px solid #eee; margin-top: 16px; padding-top: 12px; }
+.p1 .result h3 { margin-bottom: 4px; }
+.p1 .tag { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em;
+           background: #eef3ff; color: #2b4c9b; border-radius: 3px; padding: 2px 6px; vertical-align: middle; }
+.p1 .tag.auto { background: #fdeeee; color: #9b2b2b; }
+
+.p1 table.history { border-collapse: collapse; font-size: 0.85rem; width: 100%; margin-top: 8px; }
+.p1 table.history th, .p1 table.history td { border: 1px solid #e2e2e2; padding: 4px 10px; text-align: left; }
+.p1 table.history th { background: #f4f4f4; }
+.p1 table.history tr.auto-row { background: #fdf6f6; }
+
+.p1 .training-error {
+    border-left: 4px solid #b23b3b;
+    background: #fdf1f1;
+    padding: 10px 14px;
+    margin: 12px 0 0;
+    font-size: 0.9rem;
+}
+
+.p1 .headline { font-size: 1.05rem; margin: 6px 0; }

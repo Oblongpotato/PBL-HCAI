@@ -1,0 +1,15 @@
+<section class="panel">
+    <h2>3. Visualise</h2>
+    <form method="post" action="{% url 'project1:visualize' %}" class="inline-form">
+        {% csrf_token %}
+        {{ visualization_form.as_p }}
+        <button type="submit">Draw</button>
+    </form>
+
+    {% if plot %}
+        <figure class="plot">
+            <img src="{{ plot.url }}" alt="{{ plot.caption }}">
+            <figcaption>{{ plot.caption }}</figcaption>
+        </figure>
+    {% endif %}
+</section>

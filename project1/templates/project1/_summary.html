@@ -1,0 +1,42 @@
+<section class="panel">
+    <h2>2. What the app understood</h2>
+
+    <dl class="facts">
+        <dt>File</dt><dd>{{ dataset.name }}</dd>
+        <dt>Shape</dt><dd>{{ summary.n_rows }} rows &times; {{ summary.n_features }} features</dd>
+        <dt>Target</dt><dd>{{ summary.target }}</dd>
+        <dt>Detected task</dt><dd class="task">{{ summary.task }}</dd>
+        {% if summary.dropped_columns %}
+            <dt>Dropped as identifiers</dt><dd>{{ summary.dropped_columns|join:", " }}</dd>
+        {% endif %}
+        {% if summary.target_distribution %}
+            <dt>Classes</dt>
+            <dd>
+                {% for label, count in summary.target_distribution.items %}
+                    {{ label }} ({{ count }}){% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </dd>
+        {% endif %}
+    </dl>
+
+    {% if warnings %}
+        <div class="warnings">
+            <strong>Worth knowing before you trust a score:</strong>
+            <ul>{% for warning in warnings %}<li>{{ warning }}</li>{% endfor %}</ul>
+        </div>
+    {% endif %}
+
+    <div class="table-scroll">
+        <table class="preview">
+            <thead>
+                <tr>{% for column in summary.preview_columns %}<th>{{ column }}</th>{% endfor %}</tr>
+            </thead>
+            <tbody>
+                {% for row in summary.preview_rows %}
+                    <tr>{% for cell in row %}<td>{{ cell }}</td>{% endfor %}</tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p class="hint">First {{ summary.preview_rows|length }} rows.</p>
+</section>
