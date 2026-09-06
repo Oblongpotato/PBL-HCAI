@@ -14,7 +14,7 @@ from pathlib import Path
 
 from matplotlib import pyplot as plt
 
-from . import classifier, data, defer, experts
+from . import active, classifier, data, defer, experts
 
 RESULTS_FILE = Path(__file__).resolve().parent / "results" / "results.json"
 FIGURE_DIR = Path(__file__).resolve().parent / "static" / "project3" / "figures"
@@ -115,6 +115,34 @@ def _targeting_figure(result):
     return figure(f"targeting_{result['expert']}")
 
 
+LABELS = {
+    "proposed": "uncertain deferral decision x representativeness",
+    "classifier_uncertainty": "classifier uncertainty only",
+    "random": "random queries",
+}
+
+
+def _active_figure(result):
+    """System accuracy against how many questions the expert was asked."""
+    fig, ax = plt.subplots(figsize=(6.8, 4.3))
+    for strategy in result["strategies"]:
+        curve = strategy["curve"]
+        ax.plot([row["queries"] for row in curve],
+                [row["system_accuracy"] for row in curve],
+                marker="o", markersize=3, label=LABELS[strategy["strategy"]])
+
+    ax.axhline(result["baseline_accuracy"], color="grey", linestyle=":", linewidth=1,
+               label="classifier alone")
+    ax.axhline(result["full_supervision"], color="green", linestyle=":", linewidth=1,
+               label="every expert label known")
+    ax.set_xlabel("expert labels collected")
+    ax.set_ylabel("system accuracy")
+    ax.set_title(f"Learning the expert's competence ({result['expert']})")
+    ax.grid(alpha=0.3)
+    ax.legend(fontsize=8)
+    return figure(f"active_{result['expert']}")
+
+
 def run_all():
     """Produce every number and figure the page shows."""
     results = {"data": data.summary()}
@@ -140,6 +168,11 @@ def run_all():
         result.pop("css_curve"), result.pop("confidence_curve")
         deferral.append(result)
     results["deferral"] = deferral
+
+    learning = active.run("specialist")
+    learning["figure"] = _active_figure(learning)
+    learning["strategy_labels"] = LABELS
+    results["active"] = learning
 
     RESULTS_FILE.parent.mkdir(parents=True, exist_ok=True)
     RESULTS_FILE.write_text(json.dumps(results, indent=2), encoding="utf-8")

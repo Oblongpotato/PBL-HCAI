@@ -558,5 +558,341 @@
       "coverage_figure": "project3/figures/coverage_generalist.png",
       "targeting_figure": "project3/figures/targeting_generalist.png"
     }
-  ]
+  ],
+  "active": {
+    "expert": "specialist",
+    "strategies": [
+      {
+        "strategy": "proposed",
+        "curve": [
+          {
+            "queries": 50,
+            "system_accuracy": 0.885
+          },
+          {
+            "queries": 100,
+            "system_accuracy": 0.886
+          },
+          {
+            "queries": 150,
+            "system_accuracy": 0.887
+          },
+          {
+            "queries": 200,
+            "system_accuracy": 0.895
+          },
+          {
+            "queries": 250,
+            "system_accuracy": 0.896
+          },
+          {
+            "queries": 300,
+            "system_accuracy": 0.8945
+          },
+          {
+            "queries": 350,
+            "system_accuracy": 0.894
+          },
+          {
+            "queries": 400,
+            "system_accuracy": 0.896
+          },
+          {
+            "queries": 450,
+            "system_accuracy": 0.9015
+          },
+          {
+            "queries": 500,
+            "system_accuracy": 0.899
+          },
+          {
+            "queries": 550,
+            "system_accuracy": 0.895
+          },
+          {
+            "queries": 600,
+            "system_accuracy": 0.899
+          },
+          {
+            "queries": 650,
+            "system_accuracy": 0.9005
+          },
+          {
+            "queries": 700,
+            "system_accuracy": 0.9025
+          },
+          {
+            "queries": 750,
+            "system_accuracy": 0.903
+          },
+          {
+            "queries": 800,
+            "system_accuracy": 0.906
+          },
+          {
+            "queries": 850,
+            "system_accuracy": 0.909
+          },
+          {
+            "queries": 900,
+            "system_accuracy": 0.9075
+          },
+          {
+            "queries": 950,
+            "system_accuracy": 0.906
+          },
+          {
+            "queries": 1000,
+            "system_accuracy": 0.9055
+          }
+        ],
+        "competence": [
+          {
+            "topic": "World",
+            "learned": 0.205,
+            "actual": 0.35
+          },
+          {
+            "topic": "Sports",
+            "learned": 0.09,
+            "actual": 0.296
+          },
+          {
+            "topic": "Business",
+            "learned": 0.957,
+            "actual": 0.934
+          },
+          {
+            "topic": "Sci/Tech",
+            "learned": 0.916,
+            "actual": 0.962
+          }
+        ]
+      },
+      {
+        "strategy": "classifier_uncertainty",
+        "curve": [
+          {
+            "queries": 50,
+            "system_accuracy": 0.885
+          },
+          {
+            "queries": 100,
+            "system_accuracy": 0.863
+          },
+          {
+            "queries": 150,
+            "system_accuracy": 0.866
+          },
+          {
+            "queries": 200,
+            "system_accuracy": 0.8515
+          },
+          {
+            "queries": 250,
+            "system_accuracy": 0.8505
+          },
+          {
+            "queries": 300,
+            "system_accuracy": 0.8645
+          },
+          {
+            "queries": 350,
+            "system_accuracy": 0.8765
+          },
+          {
+            "queries": 400,
+            "system_accuracy": 0.882
+          },
+          {
+            "queries": 450,
+            "system_accuracy": 0.882
+          },
+          {
+            "queries": 500,
+            "system_accuracy": 0.883
+          },
+          {
+            "queries": 550,
+            "system_accuracy": 0.887
+          },
+          {
+            "queries": 600,
+            "system_accuracy": 0.881
+          },
+          {
+            "queries": 650,
+            "system_accuracy": 0.886
+          },
+          {
+            "queries": 700,
+            "system_accuracy": 0.889
+          },
+          {
+            "queries": 750,
+            "system_accuracy": 0.8925
+          },
+          {
+            "queries": 800,
+            "system_accuracy": 0.893
+          },
+          {
+            "queries": 850,
+            "system_accuracy": 0.891
+          },
+          {
+            "queries": 900,
+            "system_accuracy": 0.8945
+          },
+          {
+            "queries": 950,
+            "system_accuracy": 0.899
+          },
+          {
+            "queries": 1000,
+            "system_accuracy": 0.9005
+          }
+        ],
+        "competence": [
+          {
+            "topic": "World",
+            "learned": 0.273,
+            "actual": 0.35
+          },
+          {
+            "topic": "Sports",
+            "learned": 0.172,
+            "actual": 0.296
+          },
+          {
+            "topic": "Business",
+            "learned": 0.901,
+            "actual": 0.934
+          },
+          {
+            "topic": "Sci/Tech",
+            "learned": 0.908,
+            "actual": 0.962
+          }
+        ]
+      },
+      {
+        "strategy": "random",
+        "curve": [
+          {
+            "queries": 50,
+            "system_accuracy": 0.885
+          },
+          {
+            "queries": 100,
+            "system_accuracy": 0.8865
+          },
+          {
+            "queries": 150,
+            "system_accuracy": 0.878
+          },
+          {
+            "queries": 200,
+            "system_accuracy": 0.865
+          },
+          {
+            "queries": 250,
+            "system_accuracy": 0.8665
+          },
+          {
+            "queries": 300,
+            "system_accuracy": 0.856
+          },
+          {
+            "queries": 350,
+            "system_accuracy": 0.856
+          },
+          {
+            "queries": 400,
+            "system_accuracy": 0.865
+          },
+          {
+            "queries": 450,
+            "system_accuracy": 0.858
+          },
+          {
+            "queries": 500,
+            "system_accuracy": 0.8475
+          },
+          {
+            "queries": 550,
+            "system_accuracy": 0.8565
+          },
+          {
+            "queries": 600,
+            "system_accuracy": 0.8445
+          },
+          {
+            "queries": 650,
+            "system_accuracy": 0.847
+          },
+          {
+            "queries": 700,
+            "system_accuracy": 0.841
+          },
+          {
+            "queries": 750,
+            "system_accuracy": 0.853
+          },
+          {
+            "queries": 800,
+            "system_accuracy": 0.857
+          },
+          {
+            "queries": 850,
+            "system_accuracy": 0.861
+          },
+          {
+            "queries": 900,
+            "system_accuracy": 0.8745
+          },
+          {
+            "queries": 950,
+            "system_accuracy": 0.873
+          },
+          {
+            "queries": 1000,
+            "system_accuracy": 0.883
+          }
+        ],
+        "competence": [
+          {
+            "topic": "World",
+            "learned": 0.405,
+            "actual": 0.35
+          },
+          {
+            "topic": "Sports",
+            "learned": 0.347,
+            "actual": 0.296
+          },
+          {
+            "topic": "Business",
+            "learned": 0.92,
+            "actual": 0.934
+          },
+          {
+            "topic": "Sci/Tech",
+            "learned": 0.886,
+            "actual": 0.962
+          }
+        ]
+      }
+    ],
+    "full_supervision": 0.9175,
+    "baseline_accuracy": 0.891,
+    "budget": 1000,
+    "round": 50,
+    "figure": "project3/figures/active_specialist.png",
+    "strategy_labels": {
+      "proposed": "uncertain deferral decision x representativeness",
+      "classifier_uncertainty": "classifier uncertainty only",
+      "random": "random queries"
+    }
+  }
 }
