@@ -6,14 +6,20 @@ from django.db import models
 
 from utils import datasets
 
-# Uploads live outside MEDIA_ROOT: that directory is served publicly by pbl/urls.py,
-# while a dataset belongs to the session that uploaded it.
-private_storage = FileSystemStorage(location=settings.BASE_DIR / "private_uploads")
+def private_storage():
+    """Uploads live outside MEDIA_ROOT, which pbl/urls.py serves publicly.
+
+    This is a callable rather than an instance so migrations serialise a reference to it.
+    A storage instance would be deconstructed by value, writing whatever absolute path
+    this machine happens to use into the migration file.
+    """
+    return FileSystemStorage(location=settings.BASE_DIR / "private_uploads")
 
 
 def upload_path(instance, filename):
     """Discard the caller's filename; it is displayed from Dataset.name instead."""
     return f"{uuid.uuid4().hex}.csv"
+
 
 TASK_CHOICES = [("classification", "Classification"), ("regression", "Regression")]
 
