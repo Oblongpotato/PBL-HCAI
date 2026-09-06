@@ -1,0 +1,132 @@
+{
+  "data": {
+    "n_train": 8000,
+    "n_test": 2000,
+    "topics": [
+      "World",
+      "Sports",
+      "Business",
+      "Sci/Tech"
+    ],
+    "per_topic_train": {
+      "World": 2000,
+      "Sports": 2000,
+      "Business": 2000,
+      "Sci/Tech": 2000
+    },
+    "vocabulary": 20000,
+    "svd_components": 300,
+    "explained_variance": 0.227,
+    "example": "Mauresmo, Davenport Advance to Finals of Porche Grand Prix World number one women #39;s tennis player Amelie Mauresmo of France and number two Lindsay Davenport of the United States have advanced to the finals of the Por",
+    "example_topic": "Sports"
+  },
+  "baseline": {
+    "accuracy": 0.891,
+    "per_topic": {
+      "World": 0.892,
+      "Sports": 0.964,
+      "Business": 0.862,
+      "Sci/Tech": 0.846
+    },
+    "confusion": [
+      [
+        446,
+        21,
+        18,
+        15
+      ],
+      [
+        12,
+        482,
+        3,
+        3
+      ],
+      [
+        21,
+        7,
+        431,
+        41
+      ],
+      [
+        24,
+        8,
+        45,
+        423
+      ]
+    ],
+    "topics": [
+      "World",
+      "Sports",
+      "Business",
+      "Sci/Tech"
+    ],
+    "mean_confidence": 0.8101,
+    "confusion_figure": "project3/figures/baseline_confusion.png"
+  },
+  "experts": {
+    "reports": [
+      {
+        "key": "specialist",
+        "label": "Specialist",
+        "description": "Reads business and technology news closely, skims the rest. Strong exactly where the classifier is weakest.",
+        "accuracy": 0.6375,
+        "per_topic": {
+          "World": {
+            "expert": 0.336,
+            "classifier": 0.892,
+            "expert_better": false
+          },
+          "Sports": {
+            "expert": 0.296,
+            "classifier": 0.964,
+            "expert_better": false
+          },
+          "Business": {
+            "expert": 0.962,
+            "classifier": 0.862,
+            "expert_better": true
+          },
+          "Sci/Tech": {
+            "expert": 0.956,
+            "classifier": 0.846,
+            "expert_better": true
+          }
+        },
+        "beats_classifier_on": [
+          "Business",
+          "Sci/Tech"
+        ]
+      },
+      {
+        "key": "generalist",
+        "label": "Generalist",
+        "description": "Moderately reliable everywhere, with no particular speciality.",
+        "accuracy": 0.691,
+        "per_topic": {
+          "World": {
+            "expert": 0.682,
+            "classifier": 0.892,
+            "expert_better": false
+          },
+          "Sports": {
+            "expert": 0.652,
+            "classifier": 0.964,
+            "expert_better": false
+          },
+          "Business": {
+            "expert": 0.724,
+            "classifier": 0.862,
+            "expert_better": false
+          },
+          "Sci/Tech": {
+            "expert": 0.706,
+            "classifier": 0.846,
+            "expert_better": false
+          }
+        },
+        "beats_classifier_on": []
+      }
+    ],
+    "figure": "project3/figures/experts.png"
+  }
+}

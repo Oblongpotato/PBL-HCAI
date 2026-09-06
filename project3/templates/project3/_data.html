@@ -1,0 +1,20 @@
+<section class="panel">
+    <h2>1. The data</h2>
+    <dl class="facts">
+        <dt>Dataset</dt>
+        <dd>
+            AG News, a stratified subsample of {{ results.data.n_train }} training and
+            {{ results.data.n_test }} test articles, balanced across four topics.
+        </dd>
+        <dt>Topics</dt><dd>{{ results.data.topics|join:", " }}</dd>
+        <dt>Features</dt>
+        <dd>
+            TF-IDF over {{ results.data.vocabulary }} unigrams and bigrams, reduced to
+            {{ results.data.svd_components }} dimensions by truncated SVD
+            ({{ results.data.explained_variance }} of the variance) for the models that need
+            dense input.
+        </dd>
+        <dt>An example</dt>
+        <dd class="example">&ldquo;{{ results.data.example }}&hellip;&rdquo; <em>({{ results.data.example_topic }})</em></dd>
+    </dl>
+</section>

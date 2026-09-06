@@ -1,0 +1,27 @@
+{% load static %}
+<section class="panel">
+    <h2>2. The classifier on its own</h2>
+    <p class="hint">
+        Trained on every available label. This is the score the human-AI team has to beat, so
+        everything later is measured against it.
+    </p>
+
+    <p class="headline">Test accuracy: <strong>{{ results.baseline.accuracy }}</strong></p>
+
+    <table class="compact">
+        <thead><tr><th>Topic</th><th>accuracy</th></tr></thead>
+        <tbody>
+            {% for topic, value in results.baseline.per_topic.items %}
+                <tr><th>{{ topic }}</th><td>{{ value }}</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <figure class="plot">
+        <img src="{% static results.baseline.confusion_figure %}" alt="Confusion matrix">
+        <figcaption>
+            Sports is the easy topic. Business and Sci/Tech are confused with each other, which is
+            where a human might help.
+        </figcaption>
+    </figure>
+</section>

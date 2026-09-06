@@ -1,5 +1,12 @@
-from django.http import HttpResponse
+from django.shortcuts import render
+
+from . import experiments
 
 
 def index(request):
-    return HttpResponse("Active Learning for Learning-to-Defer — coming soon.")
+    """Display the precomputed experiment results.
+
+    Nothing is trained here. `manage.py run_project3` produces results.json and the figures,
+    both of which are committed, so this view only reads them.
+    """
+    return render(request, "project3/index.html", {"results": experiments.load()})
