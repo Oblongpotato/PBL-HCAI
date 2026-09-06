@@ -28,10 +28,18 @@ class DataTests(TestCase):
 class SelectionTests(TestCase):
     def test_lambda_never_increases_complexity(self):
         for family in training.FAMILIES:
+            top = training.lambda_max(family)
             complexities = [
-                training.select(family, lam / 1000)["complexity"] for lam in range(0, 51, 5)
+                training.select(family, top * step / 20)["complexity"] for step in range(21)
             ]
             self.assertEqual(complexities, sorted(complexities, reverse=True))
+
+    def test_each_family_offers_several_models_across_its_own_range(self):
+        # A single shared range left one family with a dead slider.
+        for family in training.FAMILIES:
+            top = training.lambda_max(family)
+            chosen = {training.select(family, top * step / 100)["value"] for step in range(101)}
+            self.assertGreaterEqual(len(chosen), 3, family)
 
     def test_zero_lambda_maximises_accuracy(self):
         for family in training.FAMILIES:
@@ -41,6 +49,11 @@ class SelectionTests(TestCase):
     def test_tree_complexity_is_its_leaf_count(self):
         entry = training.select("tree", 0.0)
         self.assertEqual(entry["complexity"], entry["pipeline"].named_steps["model"].get_n_leaves())
+
+    def test_fully_penalised_logistic_model_keeps_no_features(self):
+        entry = training.select("logistic", training.lambda_max("logistic"))
+        self.assertEqual(entry["complexity"], 0)
+        self.assertEqual(training.used_features(entry["pipeline"]), [])
 
     def test_logistic_complexity_counts_surviving_features(self):
         entry = training.select("logistic", 0.05)

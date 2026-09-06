@@ -13,7 +13,7 @@ def _selection(request):
         lam = float(request.GET.get("lam", 0.0))
     except (TypeError, ValueError):
         lam = 0.0
-    lam = min(max(lam, 0.0), training.LAMBDA_MAX)
+    lam = min(max(lam, 0.0), training.lambda_max(family))
 
     return family, round(lam, 4)
 
@@ -81,7 +81,7 @@ def index(request):
         "families": training.FAMILIES.items(),
         "family_label": training.FAMILIES[family],
         "lam": lam,
-        "lambda_max": training.LAMBDA_MAX,
+        "lambda_max": training.lambda_max(family),
         "selected": selected,
         "complexity_label": training.COMPLEXITY_LABEL[family],
         "fit_regulariser": training.FIT_REGULARISER[family],

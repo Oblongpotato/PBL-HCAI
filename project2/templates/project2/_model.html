@@ -6,8 +6,9 @@
         <dt>Fitted with</dt><dd><code>{{ fit_regulariser }} = {{ selected.value }}</code></dd>
         <dt>Complexity &Omega;(f)</dt><dd>{{ selected.complexity }} {{ complexity_label }}</dd>
         <dt>Test accuracy</dt><dd><strong>{{ selected.accuracy|floatformat:4 }}</strong></dd>
-        {% if used_features %}
-            <dt>Features used</dt><dd>{{ used_features|join:", " }}</dd>
+        {% if family != "tree" %}
+            <dt>Features used</dt>
+            <dd>{% if used_features %}{{ used_features|join:", " }}{% else %}none{% endif %}</dd>
         {% endif %}
     </dl>
 
@@ -17,6 +18,10 @@
             {% if family == "tree" %}
                 The model is the explanation: every prediction is the path from the root to a leaf,
                 and the thresholds are in the original units.
+            {% elif selected.complexity == 0 %}
+                &lambda; is high enough that the penalty outweighs any gain in accuracy, so every
+                coefficient has been driven to zero. The model now predicts the same species for
+                every penguin, which is what demanding maximum simplicity actually costs.
             {% else %}
                 One weight per feature and class. An L1 penalty drives the unused features to
                 exactly zero, which is what &Omega;(f) counts; those features are omitted here.

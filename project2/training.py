@@ -30,7 +30,11 @@ LEAF_GRID = [2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30]
 C_GRID = [round(value, 5) for value in np.logspace(-2.5, 1.5, 24)]
 
 ZERO = 1e-6
-LAMBDA_MAX = 0.05
+
+# Each family's accuracy/complexity frontier turns over in a different place, so a single
+# range leaves one of them with a dead slider. A tree switches model at lambda 0.005 and
+# 0.010; logistic regression only at 0.050 and 0.128.
+LAMBDA_MAX = {"tree": 0.02, "logistic": 0.15}
 
 
 def _preprocessor(family):
@@ -56,6 +60,10 @@ def _estimator(family, value):
 
 def grid(family):
     return LEAF_GRID if family == "tree" else C_GRID
+
+
+def lambda_max(family):
+    return LAMBDA_MAX[family]
 
 
 def source_features(pipeline):

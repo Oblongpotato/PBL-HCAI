@@ -22,9 +22,11 @@
         </div>
 
         <div class="field grow">
-            <label for="lam">&lambda; = <strong>{{ lam }}</strong></label>
+            <label for="lam">&lambda; = <strong id="lam-value">{{ lam }}</strong></label>
             <input type="range" id="lam" name="lam" min="0" max="{{ lambda_max }}" step="0.001"
-                   value="{{ lam }}" oninput="this.form.submit()">
+                   value="{{ lam }}"
+                   oninput="document.getElementById('lam-value').textContent = this.value"
+                   onchange="this.form.submit()">
             <span class="range-ends">0 &mdash; accuracy only &nbsp;&nbsp;&nbsp; {{ lambda_max }} &mdash; simplicity matters most</span>
         </div>
 
