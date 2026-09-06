@@ -8,13 +8,14 @@ import io
 
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from sklearn.datasets import load_iris
 
 from utils import datasets
 
 from .ml import SCORES
 from .models import Dataset, TrainingRun
 
-IRIS = "Resources/iris.csv"
+VARIETIES = ["Setosa", "Versicolor", "Virginica"]
 
 
 def csv_upload(text, name="data.csv"):
@@ -23,11 +24,20 @@ def csv_upload(text, name="data.csv"):
     return upload
 
 
+def iris_frame():
+    """Iris in the layout this app expects, taken from scikit-learn.
+
+    Identical to the course CSV, and available on any checkout: the course material is
+    not committed, so the tests must not read from it.
+    """
+    frame = load_iris(as_frame=True).frame
+    frame.columns = ["sepal.length", "sepal.width", "petal.length", "petal.width", "variety"]
+    frame["variety"] = frame["variety"].map(dict(enumerate(VARIETIES)))
+    return frame
+
+
 def iris_upload(name="iris.csv"):
-    with open(IRIS, "rb") as handle:
-        upload = io.BytesIO(handle.read())
-    upload.name = name
-    return upload
+    return csv_upload(iris_frame().to_csv(index=False), name)
 
 
 class UploadMixin:
@@ -174,8 +184,7 @@ class PipelineTests(UploadMixin, TestCase):
         self.assertTrue(TrainingRun.objects.get().automated)
 
     def test_regression_dataset_trains_with_a_regression_model(self):
-        frame, _ = datasets.drop_id_columns(datasets.read_csv(IRIS))
-        reordered = frame[["sepal.length", "sepal.width", "variety", "petal.length", "petal.width"]]
+        reordered = iris_frame()[["sepal.length", "sepal.width", "variety", "petal.length", "petal.width"]]
         self.upload(csv_upload(reordered.to_csv(index=False), name="reg.csv"))
         self.assertEqual(Dataset.objects.latest("uploaded_at").task, "regression")
         self.train(model="ridge", scoring="r2")
@@ -184,7 +193,7 @@ class PipelineTests(UploadMixin, TestCase):
 
 class HelperTests(TestCase):
     def test_regression_target_is_detected(self):
-        frame, _ = datasets.drop_id_columns(datasets.read_csv(IRIS))
+        frame = iris_frame()
         self.assertEqual(datasets.infer_task(frame["petal.width"]), "regression")
         self.assertEqual(datasets.infer_task(frame["variety"]), "classification")
 
