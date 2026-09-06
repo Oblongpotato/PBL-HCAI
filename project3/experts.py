@@ -49,7 +49,10 @@ def predictions(name, split):
         [PROFILES[name]["competence"][topic] for topic in data.TOPICS], dtype=float
     )
 
-    rng = np.random.default_rng(abs(hash((SEED, name, split))) % (2**32))
+    # Python hashes strings differently in every process, so seeding from hash() would give
+    # a different expert on every run. Derive the seed from fixed positions instead.
+    offset = sorted(PROFILES).index(name) * 2 + (split == "test")
+    rng = np.random.default_rng(SEED + offset)
     correct = rng.random(len(truth)) < competence[truth]
 
     # A wrong answer is one of the other three topics, drawn uniformly.

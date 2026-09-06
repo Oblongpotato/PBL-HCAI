@@ -10,6 +10,7 @@ from functools import lru_cache
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.model_selection import cross_val_predict
 
 from . import data
 
@@ -64,3 +65,22 @@ def report():
         "topics": data.TOPICS,
         "mean_confidence": round(float(np.mean(confidence("test"))), 4),
     }
+
+
+@lru_cache(maxsize=1)
+def out_of_fold_probabilities():
+    """Cross-validated probabilities on the training set.
+
+    The deferral model is told what the classifier thinks. Using the classifier's own
+    training probabilities would tell it a lie, because those are fitted on the same rows and
+    are far more confident than the classifier will be in deployment. Three-fold
+    cross-validation gives honest numbers to learn from.
+    """
+    parts = data.features()
+    return cross_val_predict(
+        LogisticRegression(max_iter=2000, C=4.0),
+        parts["X_train"],
+        parts["y_train"],
+        cv=3,
+        method="predict_proba",
+    )

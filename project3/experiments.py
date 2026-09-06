@@ -14,7 +14,7 @@ from pathlib import Path
 
 from matplotlib import pyplot as plt
 
-from . import classifier, data, experts
+from . import classifier, data, defer, experts
 
 RESULTS_FILE = Path(__file__).resolve().parent / "results" / "results.json"
 FIGURE_DIR = Path(__file__).resolve().parent / "static" / "project3" / "figures"
@@ -68,6 +68,53 @@ def _expert_figure(reports, baseline_accuracy):
     return figure("experts")
 
 
+def _coverage_figure(result):
+    """Accuracy against how often the human is asked, for both strategies."""
+    fig, ax = plt.subplots(figsize=(6.6, 4.2))
+    for points, label, style in (
+        (result["css_curve"], "learned deferral (CSS)", "-o"),
+        (result["confidence_curve"], "confidence-based rejection", "--s"),
+    ):
+        ordered = sorted(points, key=lambda row: row["deferral_rate"])
+        ax.plot([row["deferral_rate"] for row in ordered],
+                [row["system_accuracy"] for row in ordered], style, markersize=4, label=label)
+
+    ax.axhline(result["baseline_accuracy"], color="grey", linestyle=":", linewidth=1,
+               label="classifier alone")
+    ax.axhline(result["css"]["oracle_ceiling"], color="green", linestyle=":", linewidth=1,
+               label="perfect routing")
+    ax.set_xlabel("fraction of articles sent to the expert")
+    ax.set_ylabel("system accuracy")
+    ax.set_title(f"What deferring buys ({result['expert']})")
+    ax.grid(alpha=0.3)
+    ax.legend(fontsize=8)
+    return figure(f"coverage_{result['expert']}")
+
+
+def _targeting_figure(result):
+    """Where each strategy spends the same deferral budget."""
+    topics = list(result["deferral_by_topic"])
+    css = [result["deferral_by_topic"][t]["css"] for t in topics]
+    conf = [result["deferral_by_topic"][t]["confidence"] for t in topics]
+    better = [result["deferral_by_topic"][t]["expert_better"] for t in topics]
+
+    fig, ax = plt.subplots(figsize=(6.6, 4.0))
+    positions = range(len(topics))
+    ax.bar([p - 0.2 for p in positions], css, width=0.4, label="learned deferral")
+    ax.bar([p + 0.2 for p in positions], conf, width=0.4, label="confidence-based")
+    break_line = chr(10)
+    labels = [
+        topic + break_line + ("(expert better)" if flag else "(classifier better)")
+        for topic, flag in zip(topics, better)
+    ]
+    ax.set_xticks(list(positions), labels, fontsize=8)
+    ax.set_ylabel("fraction of that topic deferred")
+    ax.set_title("Where the same deferral budget is spent")
+    ax.grid(axis="y", alpha=0.3)
+    ax.legend(fontsize=8)
+    return figure(f"targeting_{result['expert']}")
+
+
 def run_all():
     """Produce every number and figure the page shows."""
     results = {"data": data.summary()}
@@ -84,6 +131,15 @@ def run_all():
         "reports": reports,
         "figure": _expert_figure(reports, baseline["accuracy"]),
     }
+
+    deferral = []
+    for name in ("specialist", "generalist"):
+        result = defer.run(name)
+        result["coverage_figure"] = _coverage_figure(result)
+        result["targeting_figure"] = _targeting_figure(result)
+        result.pop("css_curve"), result.pop("confidence_curve")
+        deferral.append(result)
+    results["deferral"] = deferral
 
     RESULTS_FILE.parent.mkdir(parents=True, exist_ok=True)
     RESULTS_FILE.write_text(json.dumps(results, indent=2), encoding="utf-8")

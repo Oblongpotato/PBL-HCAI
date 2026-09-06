@@ -1,0 +1,77 @@
+{% load static %}
+<section class="panel">
+    <h2>4. Learning to defer</h2>
+    <p class="hint">
+        Two ways to decide when to hand an article over. Confidence-based rejection defers whatever
+        the classifier is least sure about, and never looks at the expert. The learned strategy
+        trains K+1 scorers on the cost-sensitive softmax surrogate, where the K+1st option means
+        &ldquo;ask the expert&rdquo; and carries the expert's error as its cost. The class answer
+        always comes from the classifier in section 2; only the hand-over decision is learned.
+    </p>
+
+    {% for run in results.deferral %}
+        <div class="expert">
+            <h3>Working with the {{ run.expert }}</h3>
+            <p class="hint">
+                Query cost &kappa; = {{ run.kappa }}, chosen on a held-out quarter of the training
+                set rather than on the test set.
+            </p>
+
+            <div class="table-scroll">
+                <table class="compact">
+                    <thead>
+                        <tr>
+                            <th></th><th>system accuracy</th><th>deferred</th>
+                            <th>expert accuracy when asked</th><th>right party chosen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>classifier alone</th>
+                            <td>{{ run.baseline_accuracy }}</td><td>0.0</td><td>&mdash;</td><td>&mdash;</td>
+                        </tr>
+                        <tr class="highlight">
+                            <th>learned deferral</th>
+                            <td>{{ run.css.system_accuracy }}</td>
+                            <td>{{ run.css.deferral_rate }}</td>
+                            <td>{{ run.css.expert_accuracy_on_deferred }}</td>
+                            <td>{{ run.css.right_party_chosen }}</td>
+                        </tr>
+                        <tr>
+                            <th>confidence-based, same budget</th>
+                            <td>{{ run.confidence_matched.system_accuracy }}</td>
+                            <td>{{ run.confidence_matched.deferral_rate }}</td>
+                            <td>{{ run.confidence_matched.expert_accuracy_on_deferred }}</td>
+                            <td>{{ run.confidence_matched.right_party_chosen }}</td>
+                        </tr>
+                        <tr>
+                            <th>perfect routing</th>
+                            <td>{{ run.css.oracle_ceiling }}</td>
+                            <td>&mdash;</td><td>&mdash;</td><td>1.0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="figures">
+                <figure class="plot">
+                    <img src="{% static run.targeting_figure %}" alt="Where the deferral budget goes">
+                    <figcaption>
+                        The clearest difference between the two. Given the same number of questions
+                        to ask, the learned strategy spends them on the topics where the expert is
+                        actually better. Confidence-based rejection spreads them almost evenly,
+                        because a low-confidence article looks the same to it whether or not the
+                        expert can help.
+                    </figcaption>
+                </figure>
+                <figure class="plot">
+                    <img src="{% static run.coverage_figure %}" alt="Accuracy against deferral rate">
+                    <figcaption>
+                        Accuracy against how often the human is asked. The gap to perfect routing is
+                        what a linear surrogate leaves on the table.
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    {% endfor %}
+</section>
