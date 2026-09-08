@@ -117,8 +117,8 @@ class CommittedResultsTests(TestCase):
         referenced = [
             self.results["baseline"]["confusion_figure"],
             self.results["experts"]["figure"],
-            self.results["active"]["figure"],
         ]
+        referenced += [run["figure"] for run in self.results["active"]["runs"]]
         for run in self.results["deferral"]:
             referenced += [run["coverage_figure"], run["targeting_figure"]]
         for path in referenced:
@@ -134,11 +134,32 @@ class CommittedResultsTests(TestCase):
             max(run["deferral_by_topic"][t]["css"] for t in weak),
         )
 
-    def test_active_learning_beats_random_at_the_same_budget(self):
-        curves = {s["strategy"]: s["curve"] for s in self.results["active"]["strategies"]}
+    def test_active_learning_beats_random_for_the_specialist(self):
+        run = next(r for r in self.results["active"]["runs"] if r["expert"] == "specialist")
+        curves = {s["strategy"]: s["curve"] for s in run["strategies"]}
         self.assertGreater(
             curves["proposed"][-1]["system_accuracy"], curves["random"][-1]["system_accuracy"]
         )
+
+    def test_results_carry_provenance(self):
+        stamp = self.results["generated"]
+        self.assertEqual(stamp["code_hash"], experiments.code_hash())
+        self.assertFalse(experiments.is_stale(self.results))
+
+    def test_chosen_query_cost_is_justified_by_its_grid(self):
+        # Either the optimum is interior, or it sits at kappa >= 1 where deferral is switched
+        # off entirely and extending the grid could not change the answer.
+        for run in self.results["deferral"]:
+            grid = [row["kappa"] for row in run["kappa_trace"]]
+            self.assertTrue(
+                run["kappa"] != max(grid) or run["kappa"] >= 1.0,
+                f"{run['expert']} selected the grid maximum {run['kappa']}",
+            )
+
+    def test_a_useless_expert_is_never_consulted(self):
+        run = next(r for r in self.results["deferral"] if r["expert"] == "generalist")
+        self.assertEqual(run["css"]["deferral_rate"], 0.0)
+        self.assertAlmostEqual(run["css"]["system_accuracy"], run["baseline_accuracy"], places=4)
 
     def test_kappa_was_chosen_off_the_test_set(self):
         for run in self.results["deferral"]:

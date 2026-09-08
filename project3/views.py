@@ -9,4 +9,12 @@ def index(request):
     Nothing is trained here. `manage.py run_project3` produces results.json and the figures,
     both of which are committed, so this view only reads them.
     """
-    return render(request, "project3/index.html", {"results": experiments.load()})
+    results = experiments.load()
+    return render(
+        request,
+        "project3/index.html",
+        {
+            "results": results,
+            "stale": bool(results) and experiments.is_stale(results),
+        },
+    )

@@ -53,3 +53,11 @@
 
 .p3 tr.highlight { background: #eef3ff; font-weight: 600; }
 .p3 .figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; }
+
+.p3 .stale {
+    border-left: 4px solid #e0a800;
+    background: #fff8e5;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+}
+.p3 .provenance { color: #888; font-size: 0.8rem; margin-top: 18px; }

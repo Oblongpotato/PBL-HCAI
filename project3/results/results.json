@@ -144,15 +144,6 @@
           "oracle_ceiling": 0.9715
         },
         {
-          "kappa": 0.1,
-          "system_accuracy": 0.8825,
-          "deferral_rate": 0.2915,
-          "classifier_accuracy_on_kept": 0.9076,
-          "expert_accuracy_on_deferred": 0.8216,
-          "right_party_chosen": 0.8825,
-          "oracle_ceiling": 0.9715
-        },
-        {
           "kappa": 0.2,
           "system_accuracy": 0.8835,
           "deferral_rate": 0.237,
@@ -162,21 +153,39 @@
           "oracle_ceiling": 0.9715
         },
         {
-          "kappa": 0.3,
-          "system_accuracy": 0.8875,
-          "deferral_rate": 0.1895,
-          "classifier_accuracy_on_kept": 0.9025,
-          "expert_accuracy_on_deferred": 0.8232,
-          "right_party_chosen": 0.8875,
-          "oracle_ceiling": 0.9715
-        },
-        {
           "kappa": 0.4,
           "system_accuracy": 0.8965,
           "deferral_rate": 0.133,
           "classifier_accuracy_on_kept": 0.9025,
           "expert_accuracy_on_deferred": 0.8571,
           "right_party_chosen": 0.8965,
+          "oracle_ceiling": 0.9715
+        },
+        {
+          "kappa": 0.6,
+          "system_accuracy": 0.893,
+          "deferral_rate": 0.0635,
+          "classifier_accuracy_on_kept": 0.8922,
+          "expert_accuracy_on_deferred": 0.9055,
+          "right_party_chosen": 0.893,
+          "oracle_ceiling": 0.9715
+        },
+        {
+          "kappa": 0.8,
+          "system_accuracy": 0.892,
+          "deferral_rate": 0.013,
+          "classifier_accuracy_on_kept": 0.8921,
+          "expert_accuracy_on_deferred": 0.8846,
+          "right_party_chosen": 0.892,
+          "oracle_ceiling": 0.9715
+        },
+        {
+          "kappa": 1.0,
+          "system_accuracy": 0.892,
+          "deferral_rate": 0.0,
+          "classifier_accuracy_on_kept": 0.892,
+          "expert_accuracy_on_deferred": null,
+          "right_party_chosen": 0.892,
           "oracle_ceiling": 0.9715
         }
       ],
@@ -346,7 +355,7 @@
     },
     {
       "expert": "generalist",
-      "kappa": 0.4,
+      "kappa": 1.0,
       "kappa_trace": [
         {
           "kappa": 0.0,
@@ -355,15 +364,6 @@
           "classifier_accuracy_on_kept": 0.8987,
           "expert_accuracy_on_deferred": 0.7064,
           "right_party_chosen": 0.8155,
-          "oracle_ceiling": 0.971
-        },
-        {
-          "kappa": 0.1,
-          "system_accuracy": 0.82,
-          "deferral_rate": 0.3755,
-          "classifier_accuracy_on_kept": 0.8935,
-          "expert_accuracy_on_deferred": 0.6977,
-          "right_party_chosen": 0.82,
           "oracle_ceiling": 0.971
         },
         {
@@ -376,15 +376,6 @@
           "oracle_ceiling": 0.971
         },
         {
-          "kappa": 0.3,
-          "system_accuracy": 0.839,
-          "deferral_rate": 0.246,
-          "classifier_accuracy_on_kept": 0.8926,
-          "expert_accuracy_on_deferred": 0.6748,
-          "right_party_chosen": 0.839,
-          "oracle_ceiling": 0.971
-        },
-        {
           "kappa": 0.4,
           "system_accuracy": 0.8585,
           "deferral_rate": 0.1625,
@@ -392,167 +383,194 @@
           "expert_accuracy_on_deferred": 0.6862,
           "right_party_chosen": 0.8585,
           "oracle_ceiling": 0.971
+        },
+        {
+          "kappa": 0.6,
+          "system_accuracy": 0.88,
+          "deferral_rate": 0.062,
+          "classifier_accuracy_on_kept": 0.8939,
+          "expert_accuracy_on_deferred": 0.6694,
+          "right_party_chosen": 0.88,
+          "oracle_ceiling": 0.971
+        },
+        {
+          "kappa": 0.8,
+          "system_accuracy": 0.8895,
+          "deferral_rate": 0.0165,
+          "classifier_accuracy_on_kept": 0.8927,
+          "expert_accuracy_on_deferred": 0.697,
+          "right_party_chosen": 0.8895,
+          "oracle_ceiling": 0.971
+        },
+        {
+          "kappa": 1.0,
+          "system_accuracy": 0.892,
+          "deferral_rate": 0.0,
+          "classifier_accuracy_on_kept": 0.892,
+          "expert_accuracy_on_deferred": null,
+          "right_party_chosen": 0.892,
+          "oracle_ceiling": 0.971
         }
       ],
       "css": {
-        "system_accuracy": 0.8785,
-        "deferral_rate": 0.1505,
-        "classifier_accuracy_on_kept": 0.9011,
-        "expert_accuracy_on_deferred": 0.7508,
-        "right_party_chosen": 0.8785,
+        "system_accuracy": 0.891,
+        "deferral_rate": 0.0,
+        "classifier_accuracy_on_kept": 0.891,
+        "expert_accuracy_on_deferred": null,
+        "right_party_chosen": 0.891,
         "oracle_ceiling": 0.967
       },
       "confidence_matched": {
-        "system_accuracy": 0.908,
-        "deferral_rate": 0.1505,
-        "classifier_accuracy_on_kept": 0.94,
-        "expert_accuracy_on_deferred": 0.7276,
-        "right_party_chosen": 0.908,
+        "system_accuracy": 0.8905,
+        "deferral_rate": 0.0005,
+        "classifier_accuracy_on_kept": 0.8909,
+        "expert_accuracy_on_deferred": 0.0,
+        "right_party_chosen": 0.8905,
         "oracle_ceiling": 0.967
       },
       "deferral_by_topic": {
         "World": {
-          "css": 0.174,
-          "confidence": 0.152,
+          "css": 0.0,
+          "confidence": 0.0,
           "expert_better": false
         },
         "Sports": {
-          "css": 0.084,
-          "confidence": 0.098,
+          "css": 0.0,
+          "confidence": 0.0,
           "expert_better": false
         },
         "Business": {
-          "css": 0.176,
-          "confidence": 0.176,
+          "css": 0.0,
+          "confidence": 0.002,
           "expert_better": false
         },
         "Sci/Tech": {
-          "css": 0.168,
-          "confidence": 0.176,
+          "css": 0.0,
+          "confidence": 0.0,
           "expert_better": false
         }
       },
       "loss_history": [
-        2.9642,
-        2.8448,
-        2.8407,
-        2.8138,
-        2.8648,
-        2.8498,
-        2.8912,
-        2.8385,
-        2.8595,
-        2.8654,
-        2.8665,
-        2.8803,
-        2.8595,
-        2.8621,
-        2.8565,
-        2.8308,
-        2.8494,
-        2.8691,
-        2.8645,
-        2.8588,
-        2.9016,
-        2.8698,
-        2.9158,
-        2.9005,
-        2.876,
-        2.8507,
-        2.8527,
-        2.85,
-        2.8603,
-        2.8764,
-        2.8522,
-        2.8565,
-        2.8472,
-        2.8488,
-        2.8847,
-        2.8871,
-        2.8887,
-        2.8683,
-        2.8426,
-        2.857,
-        2.8566,
-        2.8319,
-        2.8631,
-        2.902,
-        2.848,
-        2.8667,
-        2.829,
-        2.8787,
-        2.911,
-        2.869,
-        2.8677,
-        2.8657,
-        2.8398,
-        2.8505,
-        2.8172,
-        2.8437,
-        2.8723,
-        2.8505,
-        2.828,
-        2.8656,
-        2.8682,
-        2.9388,
-        2.8685,
-        2.8946,
-        2.9353,
-        2.8906,
-        2.8595,
-        2.8226,
-        2.8092,
-        2.8235,
-        2.9014,
-        2.9053,
-        2.9243,
-        2.879,
-        2.8425,
-        2.9036,
-        2.8812,
-        2.8416,
-        2.8811,
-        2.8974,
-        2.898,
-        2.8265,
-        2.8406,
-        2.8744,
-        2.8101,
-        2.8288,
-        2.8059,
-        2.8651,
-        2.8843,
-        2.8673,
-        2.8964,
-        2.8416,
-        2.8951,
-        2.8989,
-        2.8579,
-        2.8635,
-        2.849,
-        2.9245,
-        2.8629,
-        2.8997,
-        2.9061,
-        2.8626,
-        2.9029,
-        2.8988,
-        2.8654,
-        2.835,
-        2.8297,
-        2.8184,
-        2.8841,
-        2.8506,
-        2.8801,
-        2.8806,
-        2.8667,
-        2.8862,
-        2.8271,
-        2.8264,
-        2.8763,
-        2.8444,
-        2.8828,
-        2.9347
+        3.459,
+        3.2,
+        3.1891,
+        3.2518,
+        3.2087,
+        3.2125,
+        3.2279,
+        3.2147,
+        3.1634,
+        3.1805,
+        3.1278,
+        3.1568,
+        3.2094,
+        3.2498,
+        3.2762,
+        3.2002,
+        3.2028,
+        3.2249,
+        3.1895,
+        3.2663,
+        3.4112,
+        3.2827,
+        3.2905,
+        3.3221,
+        3.3705,
+        3.2716,
+        3.1979,
+        3.1996,
+        3.2708,
+        3.2397,
+        3.2504,
+        3.2749,
+        3.2418,
+        3.2039,
+        3.292,
+        3.2792,
+        3.1742,
+        3.2462,
+        3.2811,
+        3.2961,
+        3.2016,
+        3.2736,
+        3.2944,
+        3.3004,
+        3.2891,
+        3.2823,
+        3.2284,
+        3.1934,
+        3.317,
+        3.2265,
+        3.2334,
+        3.3036,
+        3.2456,
+        3.2291,
+        3.2138,
+        3.219,
+        3.2328,
+        3.2228,
+        3.3067,
+        3.2704,
+        3.2473,
+        3.3723,
+        3.2969,
+        3.2552,
+        3.2638,
+        3.2766,
+        3.2655,
+        3.296,
+        3.2486,
+        3.2073,
+        3.2812,
+        3.2669,
+        3.2549,
+        3.2235,
+        3.1846,
+        3.298,
+        3.2823,
+        3.2349,
+        3.185,
+        3.2174,
+        3.2477,
+        3.1615,
+        3.2296,
+        3.1788,
+        3.2642,
+        3.2532,
+        3.2308,
+        3.3148,
+        3.2767,
+        3.1983,
+        3.1705,
+        3.231,
+        3.2213,
+        3.2397,
+        3.2773,
+        3.1835,
+        3.2531,
+        3.3026,
+        3.256,
+        3.3028,
+        3.3237,
+        3.2001,
+        3.2567,
+        3.2932,
+        3.1877,
+        3.1849,
+        3.2538,
+        3.2638,
+        3.3087,
+        3.164,
+        3.2762,
+        3.2762,
+        3.2391,
+        3.2684,
+        3.2436,
+        3.2579,
+        3.1991,
+        3.2255,
+        3.1736,
+        3.2952
       ],
       "baseline_accuracy": 0.891,
       "coverage_figure": "project3/figures/coverage_generalist.png",
@@ -560,339 +578,679 @@
     }
   ],
   "active": {
-    "expert": "specialist",
-    "strategies": [
+    "runs": [
       {
-        "strategy": "proposed",
-        "curve": [
+        "expert": "specialist",
+        "strategies": [
           {
-            "queries": 50,
-            "system_accuracy": 0.885
+            "strategy": "proposed",
+            "curve": [
+              {
+                "queries": 50,
+                "system_accuracy": 0.885
+              },
+              {
+                "queries": 100,
+                "system_accuracy": 0.886
+              },
+              {
+                "queries": 150,
+                "system_accuracy": 0.887
+              },
+              {
+                "queries": 200,
+                "system_accuracy": 0.895
+              },
+              {
+                "queries": 250,
+                "system_accuracy": 0.896
+              },
+              {
+                "queries": 300,
+                "system_accuracy": 0.8945
+              },
+              {
+                "queries": 350,
+                "system_accuracy": 0.894
+              },
+              {
+                "queries": 400,
+                "system_accuracy": 0.896
+              },
+              {
+                "queries": 450,
+                "system_accuracy": 0.9015
+              },
+              {
+                "queries": 500,
+                "system_accuracy": 0.899
+              },
+              {
+                "queries": 550,
+                "system_accuracy": 0.895
+              },
+              {
+                "queries": 600,
+                "system_accuracy": 0.899
+              },
+              {
+                "queries": 650,
+                "system_accuracy": 0.9005
+              },
+              {
+                "queries": 700,
+                "system_accuracy": 0.9025
+              },
+              {
+                "queries": 750,
+                "system_accuracy": 0.903
+              },
+              {
+                "queries": 800,
+                "system_accuracy": 0.906
+              },
+              {
+                "queries": 850,
+                "system_accuracy": 0.909
+              },
+              {
+                "queries": 900,
+                "system_accuracy": 0.9075
+              },
+              {
+                "queries": 950,
+                "system_accuracy": 0.906
+              },
+              {
+                "queries": 1000,
+                "system_accuracy": 0.9055
+              }
+            ],
+            "competence": [
+              {
+                "topic": "World",
+                "learned": 0.205,
+                "actual": 0.35
+              },
+              {
+                "topic": "Sports",
+                "learned": 0.09,
+                "actual": 0.296
+              },
+              {
+                "topic": "Business",
+                "learned": 0.957,
+                "actual": 0.934
+              },
+              {
+                "topic": "Sci/Tech",
+                "learned": 0.916,
+                "actual": 0.962
+              }
+            ]
           },
           {
-            "queries": 100,
-            "system_accuracy": 0.886
+            "strategy": "classifier_uncertainty",
+            "curve": [
+              {
+                "queries": 50,
+                "system_accuracy": 0.885
+              },
+              {
+                "queries": 100,
+                "system_accuracy": 0.863
+              },
+              {
+                "queries": 150,
+                "system_accuracy": 0.866
+              },
+              {
+                "queries": 200,
+                "system_accuracy": 0.8515
+              },
+              {
+                "queries": 250,
+                "system_accuracy": 0.8505
+              },
+              {
+                "queries": 300,
+                "system_accuracy": 0.8645
+              },
+              {
+                "queries": 350,
+                "system_accuracy": 0.8765
+              },
+              {
+                "queries": 400,
+                "system_accuracy": 0.882
+              },
+              {
+                "queries": 450,
+                "system_accuracy": 0.882
+              },
+              {
+                "queries": 500,
+                "system_accuracy": 0.883
+              },
+              {
+                "queries": 550,
+                "system_accuracy": 0.887
+              },
+              {
+                "queries": 600,
+                "system_accuracy": 0.881
+              },
+              {
+                "queries": 650,
+                "system_accuracy": 0.886
+              },
+              {
+                "queries": 700,
+                "system_accuracy": 0.889
+              },
+              {
+                "queries": 750,
+                "system_accuracy": 0.8925
+              },
+              {
+                "queries": 800,
+                "system_accuracy": 0.893
+              },
+              {
+                "queries": 850,
+                "system_accuracy": 0.891
+              },
+              {
+                "queries": 900,
+                "system_accuracy": 0.8945
+              },
+              {
+                "queries": 950,
+                "system_accuracy": 0.899
+              },
+              {
+                "queries": 1000,
+                "system_accuracy": 0.9005
+              }
+            ],
+            "competence": [
+              {
+                "topic": "World",
+                "learned": 0.273,
+                "actual": 0.35
+              },
+              {
+                "topic": "Sports",
+                "learned": 0.172,
+                "actual": 0.296
+              },
+              {
+                "topic": "Business",
+                "learned": 0.901,
+                "actual": 0.934
+              },
+              {
+                "topic": "Sci/Tech",
+                "learned": 0.908,
+                "actual": 0.962
+              }
+            ]
           },
           {
-            "queries": 150,
-            "system_accuracy": 0.887
-          },
-          {
-            "queries": 200,
-            "system_accuracy": 0.895
-          },
-          {
-            "queries": 250,
-            "system_accuracy": 0.896
-          },
-          {
-            "queries": 300,
-            "system_accuracy": 0.8945
-          },
-          {
-            "queries": 350,
-            "system_accuracy": 0.894
-          },
-          {
-            "queries": 400,
-            "system_accuracy": 0.896
-          },
-          {
-            "queries": 450,
-            "system_accuracy": 0.9015
-          },
-          {
-            "queries": 500,
-            "system_accuracy": 0.899
-          },
-          {
-            "queries": 550,
-            "system_accuracy": 0.895
-          },
-          {
-            "queries": 600,
-            "system_accuracy": 0.899
-          },
-          {
-            "queries": 650,
-            "system_accuracy": 0.9005
-          },
-          {
-            "queries": 700,
-            "system_accuracy": 0.9025
-          },
-          {
-            "queries": 750,
-            "system_accuracy": 0.903
-          },
-          {
-            "queries": 800,
-            "system_accuracy": 0.906
-          },
-          {
-            "queries": 850,
-            "system_accuracy": 0.909
-          },
-          {
-            "queries": 900,
-            "system_accuracy": 0.9075
-          },
-          {
-            "queries": 950,
-            "system_accuracy": 0.906
-          },
-          {
-            "queries": 1000,
-            "system_accuracy": 0.9055
+            "strategy": "random",
+            "curve": [
+              {
+                "queries": 50,
+                "system_accuracy": 0.885
+              },
+              {
+                "queries": 100,
+                "system_accuracy": 0.8865
+              },
+              {
+                "queries": 150,
+                "system_accuracy": 0.878
+              },
+              {
+                "queries": 200,
+                "system_accuracy": 0.865
+              },
+              {
+                "queries": 250,
+                "system_accuracy": 0.8665
+              },
+              {
+                "queries": 300,
+                "system_accuracy": 0.856
+              },
+              {
+                "queries": 350,
+                "system_accuracy": 0.856
+              },
+              {
+                "queries": 400,
+                "system_accuracy": 0.865
+              },
+              {
+                "queries": 450,
+                "system_accuracy": 0.858
+              },
+              {
+                "queries": 500,
+                "system_accuracy": 0.8475
+              },
+              {
+                "queries": 550,
+                "system_accuracy": 0.8565
+              },
+              {
+                "queries": 600,
+                "system_accuracy": 0.8445
+              },
+              {
+                "queries": 650,
+                "system_accuracy": 0.847
+              },
+              {
+                "queries": 700,
+                "system_accuracy": 0.841
+              },
+              {
+                "queries": 750,
+                "system_accuracy": 0.853
+              },
+              {
+                "queries": 800,
+                "system_accuracy": 0.857
+              },
+              {
+                "queries": 850,
+                "system_accuracy": 0.861
+              },
+              {
+                "queries": 900,
+                "system_accuracy": 0.8745
+              },
+              {
+                "queries": 950,
+                "system_accuracy": 0.873
+              },
+              {
+                "queries": 1000,
+                "system_accuracy": 0.883
+              }
+            ],
+            "competence": [
+              {
+                "topic": "World",
+                "learned": 0.405,
+                "actual": 0.35
+              },
+              {
+                "topic": "Sports",
+                "learned": 0.347,
+                "actual": 0.296
+              },
+              {
+                "topic": "Business",
+                "learned": 0.92,
+                "actual": 0.934
+              },
+              {
+                "topic": "Sci/Tech",
+                "learned": 0.886,
+                "actual": 0.962
+              }
+            ]
           }
         ],
-        "competence": [
-          {
-            "topic": "World",
-            "learned": 0.205,
-            "actual": 0.35
-          },
-          {
-            "topic": "Sports",
-            "learned": 0.09,
-            "actual": 0.296
-          },
-          {
-            "topic": "Business",
-            "learned": 0.957,
-            "actual": 0.934
-          },
-          {
-            "topic": "Sci/Tech",
-            "learned": 0.916,
-            "actual": 0.962
-          }
-        ]
+        "full_supervision": 0.9175,
+        "baseline_accuracy": 0.891,
+        "budget": 1000,
+        "round": 50,
+        "figure": "project3/figures/active_specialist.png"
       },
       {
-        "strategy": "classifier_uncertainty",
-        "curve": [
+        "expert": "generalist",
+        "strategies": [
           {
-            "queries": 50,
-            "system_accuracy": 0.885
+            "strategy": "proposed",
+            "curve": [
+              {
+                "queries": 50,
+                "system_accuracy": 0.8925
+              },
+              {
+                "queries": 100,
+                "system_accuracy": 0.8795
+              },
+              {
+                "queries": 150,
+                "system_accuracy": 0.8765
+              },
+              {
+                "queries": 200,
+                "system_accuracy": 0.869
+              },
+              {
+                "queries": 250,
+                "system_accuracy": 0.859
+              },
+              {
+                "queries": 300,
+                "system_accuracy": 0.86
+              },
+              {
+                "queries": 350,
+                "system_accuracy": 0.8605
+              },
+              {
+                "queries": 400,
+                "system_accuracy": 0.8595
+              },
+              {
+                "queries": 450,
+                "system_accuracy": 0.856
+              },
+              {
+                "queries": 500,
+                "system_accuracy": 0.8525
+              },
+              {
+                "queries": 550,
+                "system_accuracy": 0.855
+              },
+              {
+                "queries": 600,
+                "system_accuracy": 0.851
+              },
+              {
+                "queries": 650,
+                "system_accuracy": 0.8485
+              },
+              {
+                "queries": 700,
+                "system_accuracy": 0.8475
+              },
+              {
+                "queries": 750,
+                "system_accuracy": 0.8495
+              },
+              {
+                "queries": 800,
+                "system_accuracy": 0.8475
+              },
+              {
+                "queries": 850,
+                "system_accuracy": 0.847
+              },
+              {
+                "queries": 900,
+                "system_accuracy": 0.8425
+              },
+              {
+                "queries": 950,
+                "system_accuracy": 0.844
+              },
+              {
+                "queries": 1000,
+                "system_accuracy": 0.845
+              }
+            ],
+            "competence": [
+              {
+                "topic": "World",
+                "learned": 0.488,
+                "actual": 0.738
+              },
+              {
+                "topic": "Sports",
+                "learned": 0.359,
+                "actual": 0.702
+              },
+              {
+                "topic": "Business",
+                "learned": 0.555,
+                "actual": 0.688
+              },
+              {
+                "topic": "Sci/Tech",
+                "learned": 0.44,
+                "actual": 0.712
+              }
+            ]
           },
           {
-            "queries": 100,
-            "system_accuracy": 0.863
+            "strategy": "classifier_uncertainty",
+            "curve": [
+              {
+                "queries": 50,
+                "system_accuracy": 0.8925
+              },
+              {
+                "queries": 100,
+                "system_accuracy": 0.874
+              },
+              {
+                "queries": 150,
+                "system_accuracy": 0.87
+              },
+              {
+                "queries": 200,
+                "system_accuracy": 0.859
+              },
+              {
+                "queries": 250,
+                "system_accuracy": 0.8605
+              },
+              {
+                "queries": 300,
+                "system_accuracy": 0.859
+              },
+              {
+                "queries": 350,
+                "system_accuracy": 0.8475
+              },
+              {
+                "queries": 400,
+                "system_accuracy": 0.838
+              },
+              {
+                "queries": 450,
+                "system_accuracy": 0.8365
+              },
+              {
+                "queries": 500,
+                "system_accuracy": 0.8475
+              },
+              {
+                "queries": 550,
+                "system_accuracy": 0.8505
+              },
+              {
+                "queries": 600,
+                "system_accuracy": 0.8655
+              },
+              {
+                "queries": 650,
+                "system_accuracy": 0.87
+              },
+              {
+                "queries": 700,
+                "system_accuracy": 0.8795
+              },
+              {
+                "queries": 750,
+                "system_accuracy": 0.877
+              },
+              {
+                "queries": 800,
+                "system_accuracy": 0.872
+              },
+              {
+                "queries": 850,
+                "system_accuracy": 0.868
+              },
+              {
+                "queries": 900,
+                "system_accuracy": 0.867
+              },
+              {
+                "queries": 950,
+                "system_accuracy": 0.864
+              },
+              {
+                "queries": 1000,
+                "system_accuracy": 0.868
+              }
+            ],
+            "competence": [
+              {
+                "topic": "World",
+                "learned": 0.438,
+                "actual": 0.738
+              },
+              {
+                "topic": "Sports",
+                "learned": 0.491,
+                "actual": 0.702
+              },
+              {
+                "topic": "Business",
+                "learned": 0.54,
+                "actual": 0.688
+              },
+              {
+                "topic": "Sci/Tech",
+                "learned": 0.513,
+                "actual": 0.712
+              }
+            ]
           },
           {
-            "queries": 150,
-            "system_accuracy": 0.866
-          },
-          {
-            "queries": 200,
-            "system_accuracy": 0.8515
-          },
-          {
-            "queries": 250,
-            "system_accuracy": 0.8505
-          },
-          {
-            "queries": 300,
-            "system_accuracy": 0.8645
-          },
-          {
-            "queries": 350,
-            "system_accuracy": 0.8765
-          },
-          {
-            "queries": 400,
-            "system_accuracy": 0.882
-          },
-          {
-            "queries": 450,
-            "system_accuracy": 0.882
-          },
-          {
-            "queries": 500,
-            "system_accuracy": 0.883
-          },
-          {
-            "queries": 550,
-            "system_accuracy": 0.887
-          },
-          {
-            "queries": 600,
-            "system_accuracy": 0.881
-          },
-          {
-            "queries": 650,
-            "system_accuracy": 0.886
-          },
-          {
-            "queries": 700,
-            "system_accuracy": 0.889
-          },
-          {
-            "queries": 750,
-            "system_accuracy": 0.8925
-          },
-          {
-            "queries": 800,
-            "system_accuracy": 0.893
-          },
-          {
-            "queries": 850,
-            "system_accuracy": 0.891
-          },
-          {
-            "queries": 900,
-            "system_accuracy": 0.8945
-          },
-          {
-            "queries": 950,
-            "system_accuracy": 0.899
-          },
-          {
-            "queries": 1000,
-            "system_accuracy": 0.9005
+            "strategy": "random",
+            "curve": [
+              {
+                "queries": 50,
+                "system_accuracy": 0.8925
+              },
+              {
+                "queries": 100,
+                "system_accuracy": 0.863
+              },
+              {
+                "queries": 150,
+                "system_accuracy": 0.8425
+              },
+              {
+                "queries": 200,
+                "system_accuracy": 0.8295
+              },
+              {
+                "queries": 250,
+                "system_accuracy": 0.8175
+              },
+              {
+                "queries": 300,
+                "system_accuracy": 0.819
+              },
+              {
+                "queries": 350,
+                "system_accuracy": 0.805
+              },
+              {
+                "queries": 400,
+                "system_accuracy": 0.802
+              },
+              {
+                "queries": 450,
+                "system_accuracy": 0.797
+              },
+              {
+                "queries": 500,
+                "system_accuracy": 0.8035
+              },
+              {
+                "queries": 550,
+                "system_accuracy": 0.797
+              },
+              {
+                "queries": 600,
+                "system_accuracy": 0.8035
+              },
+              {
+                "queries": 650,
+                "system_accuracy": 0.804
+              },
+              {
+                "queries": 700,
+                "system_accuracy": 0.816
+              },
+              {
+                "queries": 750,
+                "system_accuracy": 0.822
+              },
+              {
+                "queries": 800,
+                "system_accuracy": 0.8195
+              },
+              {
+                "queries": 850,
+                "system_accuracy": 0.8225
+              },
+              {
+                "queries": 900,
+                "system_accuracy": 0.8255
+              },
+              {
+                "queries": 950,
+                "system_accuracy": 0.8375
+              },
+              {
+                "queries": 1000,
+                "system_accuracy": 0.844
+              }
+            ],
+            "competence": [
+              {
+                "topic": "World",
+                "learned": 0.715,
+                "actual": 0.738
+              },
+              {
+                "topic": "Sports",
+                "learned": 0.682,
+                "actual": 0.702
+              },
+              {
+                "topic": "Business",
+                "learned": 0.779,
+                "actual": 0.688
+              },
+              {
+                "topic": "Sci/Tech",
+                "learned": 0.69,
+                "actual": 0.712
+              }
+            ]
           }
         ],
-        "competence": [
-          {
-            "topic": "World",
-            "learned": 0.273,
-            "actual": 0.35
-          },
-          {
-            "topic": "Sports",
-            "learned": 0.172,
-            "actual": 0.296
-          },
-          {
-            "topic": "Business",
-            "learned": 0.901,
-            "actual": 0.934
-          },
-          {
-            "topic": "Sci/Tech",
-            "learned": 0.908,
-            "actual": 0.962
-          }
-        ]
-      },
-      {
-        "strategy": "random",
-        "curve": [
-          {
-            "queries": 50,
-            "system_accuracy": 0.885
-          },
-          {
-            "queries": 100,
-            "system_accuracy": 0.8865
-          },
-          {
-            "queries": 150,
-            "system_accuracy": 0.878
-          },
-          {
-            "queries": 200,
-            "system_accuracy": 0.865
-          },
-          {
-            "queries": 250,
-            "system_accuracy": 0.8665
-          },
-          {
-            "queries": 300,
-            "system_accuracy": 0.856
-          },
-          {
-            "queries": 350,
-            "system_accuracy": 0.856
-          },
-          {
-            "queries": 400,
-            "system_accuracy": 0.865
-          },
-          {
-            "queries": 450,
-            "system_accuracy": 0.858
-          },
-          {
-            "queries": 500,
-            "system_accuracy": 0.8475
-          },
-          {
-            "queries": 550,
-            "system_accuracy": 0.8565
-          },
-          {
-            "queries": 600,
-            "system_accuracy": 0.8445
-          },
-          {
-            "queries": 650,
-            "system_accuracy": 0.847
-          },
-          {
-            "queries": 700,
-            "system_accuracy": 0.841
-          },
-          {
-            "queries": 750,
-            "system_accuracy": 0.853
-          },
-          {
-            "queries": 800,
-            "system_accuracy": 0.857
-          },
-          {
-            "queries": 850,
-            "system_accuracy": 0.861
-          },
-          {
-            "queries": 900,
-            "system_accuracy": 0.8745
-          },
-          {
-            "queries": 950,
-            "system_accuracy": 0.873
-          },
-          {
-            "queries": 1000,
-            "system_accuracy": 0.883
-          }
-        ],
-        "competence": [
-          {
-            "topic": "World",
-            "learned": 0.405,
-            "actual": 0.35
-          },
-          {
-            "topic": "Sports",
-            "learned": 0.347,
-            "actual": 0.296
-          },
-          {
-            "topic": "Business",
-            "learned": 0.92,
-            "actual": 0.934
-          },
-          {
-            "topic": "Sci/Tech",
-            "learned": 0.886,
-            "actual": 0.962
-          }
-        ]
+        "full_supervision": 0.9005,
+        "baseline_accuracy": 0.891,
+        "budget": 1000,
+        "round": 50,
+        "figure": "project3/figures/active_generalist.png"
       }
     ],
-    "full_supervision": 0.9175,
-    "baseline_accuracy": 0.891,
-    "budget": 1000,
-    "round": 50,
-    "figure": "project3/figures/active_specialist.png",
     "strategy_labels": {
       "proposed": "uncertain deferral decision x representativeness",
       "classifier_uncertainty": "classifier uncertainty only",
       "random": "random queries"
     }
+  },
+  "generated": {
+    "utc": "2026-09-08 21:11 UTC",
+    "git_sha": "69522b9",
+    "code_hash": "ebe10d1b4e485659"
   }
 }

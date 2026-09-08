@@ -53,6 +53,15 @@
                 </table>
             </div>
 
+            {% if run.css.deferral_rate == 0.0 %}
+                <p class="hint">
+                    The search settled on the largest query cost in the grid, which switches deferral
+                    off. That is the right answer rather than a failure: this expert is better on no
+                    topic, so there is no region for the router to aim at and every hand-over is a
+                    loss. The system falls back to the classifier alone.
+                </p>
+            {% endif %}
+
             <div class="figures">
                 <figure class="plot">
                     <img src="{% static run.targeting_figure %}" alt="Where the deferral budget goes">

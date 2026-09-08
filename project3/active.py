@@ -68,26 +68,24 @@ def run_strategy(name, expert_name, seed=SEED):
     density = _density(Z_train, rng)
 
     queried = []
-    pool = list(range(len(Z_train)))
+    available = np.ones(len(Z_train), dtype=bool)
+    pool = np.flatnonzero(available)
     curve = []
 
     while len(queried) < BUDGET:
-        if not queried:
+        if not queried or name == "random":
             picks = rng.choice(pool, size=ROUND, replace=False)
+        elif name == "classifier_uncertainty":
+            picks = pool[np.argsort(-p_classifier_train[pool])[-ROUND:]]
         else:
+            # Only this strategy reads the competence model, so only this branch fits one.
             estimate = _competence_model(Z_train, queried, expert_right_train[queried])
-            if name == "random":
-                picks = rng.choice(pool, size=ROUND, replace=False)
-            elif name == "classifier_uncertainty":
-                utility = -p_classifier_train[pool]
-                picks = np.asarray(pool)[np.argsort(utility)[-ROUND:]]
-            else:
-                closeness = -np.abs(estimate(Z_train[pool]) - p_classifier_train[pool])
-                utility = closeness * density[pool]
-                picks = np.asarray(pool)[np.argsort(utility)[-ROUND:]]
+            closeness = -np.abs(estimate(Z_train[pool]) - p_classifier_train[pool])
+            picks = pool[np.argsort(closeness * density[pool])[-ROUND:]]
 
         queried.extend(int(index) for index in picks)
-        pool = [index for index in pool if index not in set(picks.tolist())]
+        available[picks] = False
+        pool = np.flatnonzero(available)
 
         estimate = _competence_model(Z_train, queried, expert_right_train[queried])
         p_expert_test = estimate(Z_test)

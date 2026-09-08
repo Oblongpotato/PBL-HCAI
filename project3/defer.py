@@ -25,7 +25,10 @@ import numpy as np
 
 from . import classifier, data, experts
 
-KAPPAS = (0.0, 0.1, 0.2, 0.3, 0.4)
+# When the expert is right the deferral option carries weight 1 - kappa, so at kappa >= 1
+# deferral is never encouraged and the option is effectively switched off. The grid therefore
+# brackets the optimum by construction rather than stopping at an arbitrary value.
+KAPPAS = (0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
 VALIDATION_FRACTION = 0.25
 EPOCHS = 120
 BATCH = 256

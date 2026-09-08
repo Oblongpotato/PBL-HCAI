@@ -9,15 +9,46 @@ Figures go under `static/`, not `MEDIA_ROOT`: media is gitignored and would not 
 clone.
 """
 
+import hashlib
 import json
+import subprocess
+from datetime import datetime, timezone
 from pathlib import Path
 
 from matplotlib import pyplot as plt
 
 from . import active, classifier, data, defer, experts
 
-RESULTS_FILE = Path(__file__).resolve().parent / "results" / "results.json"
-FIGURE_DIR = Path(__file__).resolve().parent / "static" / "project3" / "figures"
+APP_DIR = Path(__file__).resolve().parent
+RESULTS_FILE = APP_DIR / "results" / "results.json"
+FIGURE_DIR = APP_DIR / "static" / "project3" / "figures"
+
+# The modules whose behaviour determines the numbers. Everything committed under results/ and
+# figures/ is a build output, and nothing else would notice if the code moved on without it.
+SOURCES = ("data.py", "classifier.py", "experts.py", "defer.py", "active.py", "experiments.py")
+
+
+def code_hash():
+    """A digest over the modules that produce the results."""
+    digest = hashlib.sha256()
+    for name in SOURCES:
+        digest.update((APP_DIR / name).read_bytes())
+    return digest.hexdigest()[:16]
+
+
+def _git_sha():
+    try:
+        return subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"],
+            cwd=APP_DIR, capture_output=True, text=True, timeout=5, check=True,
+        ).stdout.strip()
+    except Exception:
+        return "unknown"
+
+
+def is_stale(results):
+    """True when the committed results were produced by different code than is checked out."""
+    return results.get("generated", {}).get("code_hash") != code_hash()
 
 
 def figure(name):
@@ -169,10 +200,20 @@ def run_all():
         deferral.append(result)
     results["deferral"] = deferral
 
-    learning = active.run("specialist")
-    learning["figure"] = _active_figure(learning)
-    learning["strategy_labels"] = LABELS
-    results["active"] = learning
+    # Both experts, not just the specialist: the generalist curve is the direct evidence for
+    # why deferring to an expert with no complementary region cannot pay.
+    learning = []
+    for name in ("specialist", "generalist"):
+        run = active.run(name)
+        run["figure"] = _active_figure(run)
+        learning.append(run)
+    results["active"] = {"runs": learning, "strategy_labels": LABELS}
+
+    results["generated"] = {
+        "utc": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+        "git_sha": _git_sha(),
+        "code_hash": code_hash(),
+    }
 
     RESULTS_FILE.parent.mkdir(parents=True, exist_ok=True)
     RESULTS_FILE.write_text(json.dumps(results, indent=2), encoding="utf-8")
