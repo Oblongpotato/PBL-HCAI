@@ -1,120 +1,238 @@
-# HCAI PBL — lecture content applied per project
+# Notes: where the lecture material shows up in the code
 
-One Django project, four apps (`project1`–`project4`), reachable from the home page at
-`/home/`. This document records, project by project, **which lecture material was applied
-and how it shows up in the code**. It is written after a feature branch has been stress
-tested and reviewed.
+One Django project with four apps (`project1`–`project4`), all reachable from the home page
+at `/home/`. These notes record, for each project, which lecture material I used and where
+it ended up in the code.
 
-Shared surface used by all projects:
+Shared across all projects:
 
 | Path | Role |
 |---|---|
-| `pbl/settings.py`, `pbl/urls.py` | app registration and routing (all four apps registered up front) |
-| `home/views.py` | group members and the project links, defined in Python (project 1, task 1) |
+| `pbl/settings.py`, `pbl/urls.py` | app registration and routing; all four apps are registered up front |
+| `home/views.py` | group members and project links, defined in Python (project 1, task 1) |
 | `templates/base.html`, `static/style.css` | global layout and style |
-| `static/<app>/`, `templates/<app>/` | mandated per-app paths for CSS and templates |
-| `utils/datasets.py`, `utils/plotting.py` | project-agnostic CSV loading / inspection and matplotlib→media rendering |
-| `demos/` | instructor's reference app — read, never modified |
+| `static/<app>/`, `templates/<app>/` | the per-app paths required by the assignment |
+| `utils/datasets.py`, `utils/plotting.py` | CSV loading and inspection, and rendering matplotlib figures into media |
+| `demos/` | the reference app that came with the skeleton; I read it but did not change it |
+
+## Datasets
+
+| Project | Data | Where it came from |
+|---|---|---|
+| 1 | any uploaded CSV | first row holds the feature names, last column is the target; developed against the course iris file |
+| 2 | `project2/data/penguins.csv` | exported once from the `palmerpenguins` package and committed, so the numbers are reproducible and the app needs no download at runtime |
+| 3 | `project3/data/agnews_*.csv` | a stratified subsample of AG News, 2000 training and 500 test articles per topic, drawn once with a fixed seed and committed for the same reason |
+
+The tests do not read the course material, since it is not committed. `project1/tests.py`
+builds its iris frame from `sklearn.datasets.load_iris`, which is the same data.
 
 ---
 
 ## Project 1 — Supervised Learning Interface
 
-**App:** `project1/` · **Route:** `/project1/` · **Dataset:** any CSV (first row = feature
-names, last column = target); developed against `Resources/iris.csv`.
+App `project1/`, route `/project1/`. Upload a CSV, look at it, train a model on it.
 
-The page is a single scrolling workflow with five numbered blocks — *Data → What the app
-understood → Visualise → Train → Automation* — which is deliberately the shape of the ML
-pipeline the course opens with.
+The page is one scrolling workflow of five blocks: Data, What the app understood, Visualise,
+Train, Automation. That is the order of the pipeline the course opens with.
 
-### Lecture 1 — Introduction: the ML pipeline and AutoML
+### Lecture 1: the ML pipeline
 
-Lecture 1's pipeline (choose a hypothesis class → split → fit for several hyperparameter
-values → score) is the literal control flow of `project1/ml.py:run_sweep()`:
+The lecture's four steps (pick a hypothesis class, split the data, fit for several
+hyperparameter values, score) are the control flow of `project1/ml.py:run_sweep()`.
 
-- **Hypothesis class.** `ml.MODELS` is a registry of eight estimators, four per task, each
-  entry naming its single exposed hyperparameter, a default grid, and a one-line trade-off
-  note that is surfaced to the user in the "Train a model" table. Ridge regression is
-  included because it is the lecture's worked example of a linear model with quadratic
-  penalisation.
-- **Train/test split and penalisation.** `train_test_split` with a user-chosen test
-  fraction and seed; stratification is enabled automatically for classification whenever
-  every class has at least two rows.
-- **Sweep over the hyperparameter.** One `Pipeline` is fit per grid value, and
-  `plots.score_curve()` draws score-against-hyperparameter — the curve the lecture uses to
-  argue that a hyperparameter is chosen by evaluation, not by fitting.
-- **Score selection.** `ml.SCORES` carries a `maximise` flag so that error scores (MSE,
-  MAE) select the *smallest* value while accuracy-type scores select the largest.
+`ml.MODELS` is a registry of eight estimators, four per task type. Each entry names the one
+hyperparameter the app exposes, a default range for it, and a short note on the trade-off,
+which the "Train a model" table shows to the user. Ridge regression is in the list because
+it is the lecture's own worked example of a linear model with a quadratic penalty.
 
-The lecture's **AutoML pros/cons** slide ("the user is not in control", "does not exploit
-domain expertise") is turned into an interactive argument rather than a paragraph:
-`ml.automatic_choice()` fixes model, grid, split and score with no user input, `views.automl`
-runs it, and the run history table labels every row **"decided by: you / the app"** so the
-two regimes can be compared side by side on the same data. This is section 5 of the page.
+The split took some thought. An earlier version picked the hyperparameter on the test set
+and then reported that same score, which flatters the model: on a pure-noise dataset it
+claimed 0.50 accuracy. Now the test set is held out first, the hyperparameter is chosen by
+5-fold cross-validation inside the training set only, the winning value is refit on the full
+training set, and the untouched test score is what the page reports. Both numbers are shown,
+because the gap between them is the interesting part. On the same noise dataset the reported
+score is now 0.389.
 
-Lecture 1's point that **a human is hiding behind every step** drives
-`utils/datasets.quality_warnings()` — class imbalance, missing values, tiny sample size,
-non-numeric columns and rare classes are reported *before* any score is shown, instead of
-being silently handled.
+`ml.SCORES` carries a `maximise` flag, so error scores such as MSE and MAE select the
+smallest value while accuracy-type scores select the largest.
 
-### Lecture 8 — Interactive ML: what a good IML interface contains
+### Lecture 1: AutoML, and who is in control
 
-Lecture 8 lists four elements of a good interactive-ML interface. Each one is a block on
-the page, in that order:
+The lecture's objection to AutoML is that the user is not in control and their domain
+expertise goes unused. Rather than describe that, the app lets you compare the two.
+`ml.automatic_choice()` fixes the model, the range, the split and the score with no user
+input, `views.automl` runs it, and the run history table marks every row with who decided:
+you or the app. Both appear side by side on the same data.
 
-| Lecture 8 element | Where |
+The lecture's other point, that a human is hiding behind every step, is why
+`utils/datasets.quality_warnings()` exists. Class imbalance, missing values, a small sample,
+non-numeric columns and rare classes are reported before any score is shown.
+
+### Lecture 8: what an interactive ML interface needs
+
+Lecture 8 lists four things such an interface should offer. Each is a block on the page:
+
+| Element | Where |
 |---|---|
-| Data visualisation | section 3, `project1/plots.py` — four plot kinds: feature pair coloured by target, feature against target, per-class distribution, correlation matrix |
-| Pre-processing | section 2 — detected task, dropped identifier columns, data-quality warnings, 10-row preview; scaling and one-hot encoding are automated in `ml._preprocessor()` and declared to the user |
-| Model selection and tuning | section 4 — model, hyperparameter range, test fraction, seed and score are all user-controlled form fields (`project1/forms.py:TrainingForm`) |
-| Results visualisation | section 4 — score curve, best value, train/test sizes, and a confusion matrix for the selected classifier |
+| Data visualisation | block 3, `project1/plots.py`: feature pair coloured by target, feature against target, per-class distribution, correlation matrix |
+| Pre-processing | block 2: detected task, dropped identifier columns, quality warnings, a 10-row preview. Scaling and one-hot encoding happen in `ml._preprocessor()` and are stated on the page |
+| Model selection and tuning | block 4: model, hyperparameter range, test fraction, seed and score are all form fields (`project1/forms.py:TrainingForm`) |
+| Results visualisation | block 4: the cross-validation curve, the chosen value, the test score, train and test sizes, and a confusion matrix |
 
-The split between **parametric** interaction (the user moves a parameter: grid, test
-fraction, seed) and what stays automatic (encoding, scaling, fitting) is the answer to
-project task 4's "what should the user be in control of?", and the page states it in prose
-above the form.
+This is also my answer to task 4's question about what the user should control. The user
+moves parameters: the range, the test fraction, the seed, the score. The app handles
+encoding, scaling, splitting and fitting, and says so above the form.
 
-### Lecture 2 — Explainability: the accuracy↔interpretability trade-off
+### Lecture 2: accuracy against interpretability
 
-Not a task of project 1, but it decides the model menu. Each entry in `ml.MODELS` carries a
-`note` shown in the model table: logistic regression is "one weight per feature, so the
-model can be read directly", random forest is "usually accurate, but no longer readable by
-a human". Choosing a model in this app is therefore framed as a trade-off, not as a
-ranking by score.
+Not one of project 1's tasks, but it decides what goes in the model menu. Every entry in
+`ml.MODELS` carries a note shown in the table: logistic regression gives one weight per
+feature and can be read directly, a random forest is usually more accurate but no longer
+readable. Picking a model is presented as a trade-off rather than a ranking by score.
 
-### Lecture 12 — Fairness: bias visible before the score
+### Lecture 12: bias and privacy
 
-The class-imbalance warning in `quality_warnings()` names the majority and minority class
-with their counts and states that *accuracy will flatter the majority class* — the
-representation-bias and metric-choice argument of lecture 12, placed where it changes
-behaviour (before training) rather than in a report.
+The class-imbalance warning names the majority and minority class with their counts and says
+that accuracy will flatter the majority class. It appears before training rather than in a
+footnote.
 
-### Persistence
+Uploaded files are also a privacy question. `MEDIA_ROOT` is served publicly by `pbl/urls.py`,
+so `Dataset.file` writes to a separate `private_uploads/` directory under a random filename,
+and the caller's own filename is discarded.
 
-`project1/models.py` defines `Dataset` (the uploaded CSV plus what was inferred about it)
-and `TrainingRun` (one sweep: model, grid, scores, split, seed, score name, and whether it
-was automated). `TrainingRun` is what makes the human-vs-AutoML comparison in section 5
-possible, and doubles as an audit trail of what the user tried.
+### What is stored
+
+`project1/models.py` defines `Dataset` (the uploaded file and what was inferred about it) and
+`TrainingRun` (one sweep: model, range, cross-validation scores, split, seed, score name, the
+selection score, the test score, and whether it was automated). `TrainingRun` is what makes
+the comparison in block 5 possible, and it doubles as a record of what was tried.
 
 ---
 
 ## Project 2 — Explainability
 
-*To be completed when `feature/project-2` is reviewed.* Planned lecture coverage: **L2**
-(interpretable models, accuracy↔interpretability), **L4** (Rashomon set, regularisation for
-interpretability), **L3** (counterfactual explanations with MAD-weighted L1; PDP and ALE,
-hand-implemented).
+App `project2/`, route `/project2/`. Palmer Penguins, 333 complete rows out of 344,
+predicting `species` from four measurements plus island, sex and year. 100 rows are held out
+for testing.
+
+Everything on the page describes one model, and the choice of that model lives in the query
+string (`?family=&lam=&row=&target=&feature=`). Choosing a different model class or a
+different λ changes the tree, the counterfactuals and the effect plots together, which is
+what the assignment asks for.
+
+### Lectures 2 and 4: interpretable models and a complexity penalty
+
+Two families are offered, a decision tree and L1-penalised logistic regression. Both are
+fitted at a range of regularisation strengths, and Ω(f) measures how complex the result is:
+leaves for the tree, and the number of original features with a non-zero coefficient for
+logistic regression. The λ slider picks the model maximising `accuracy − λ·Ω(f)`.
+
+Two different regularisers are involved and the page keeps them apart. `max_leaf_nodes` and
+`C` constrain a model while it is being fitted. λ weighs complexity afterwards, when choosing
+between models that have already been fitted.
+
+The trade-off curve is where lecture 4 shows up. Accuracy flattens after about three leaves,
+so the region in which a much simpler model is as good as a complicated one is visible rather
+than asserted. Each family has its own λ range, because their frontiers turn over in
+different places; one shared range left one family with a slider that did nothing. Pushed far
+enough, the logistic model loses every coefficient and predicts a single species, which is
+what demanding maximum simplicity actually costs.
+
+Trees are fitted without scaling. They are scale-invariant anyway, and unscaled thresholds
+read as `flipper_length_mm <= 207.5` instead of `<= 0.459`.
+
+### Lecture 3: counterfactuals
+
+`project2/counterfactuals.py` follows the method from the lecture. Sample points around the
+chosen penguin, keep the ones the selected model assigns to the target species, and rank them
+by MAD-weighted L1 distance, so a millimetre of bill and a gram of body mass are compared on
+the scale the data itself sets. Numeric features are noised on their own scale. Island, sex
+and year cannot be nudged, so they are redrawn from the values that actually occur. If
+nothing is found the search widens before giving up.
+
+### Lecture 3: PDP and ALE
+
+`project2/effects.py` implements both by hand, as required. PDP replaces the chosen feature
+with each grid value across the whole dataset and averages the predicted probabilities; the
+three curves sum to 1 at every point. ALE accumulates local differences inside quantile
+intervals, using only the penguins that fall in each interval, which keeps it usable when
+features are correlated.
+
+The lecture asks which model has an exact partial derivative. A multinomial logistic model
+does: ∂P_c/∂x_j = P_c(w_cj − Σ_k P_k w_kj), corrected for the standardisation applied before
+fitting. That version is drawn over the finite-difference estimate and the two agree to
+0.0024, which is the check that the derivation is right. A decision tree is piecewise
+constant, so its derivative is zero almost everywhere with jumps at the split thresholds, and
+only the discretised estimate exists for it. The page says which case applies.
+
+---
 
 ## Project 3 — Active Learning for Learning-to-Defer
 
-*To be completed when `feature/project-3` is reviewed.* Planned lecture coverage: **L5**
-(rejection/deferral loss, (K+1)-class scorer, CSS surrogate), **L6** (pool-based active
-learning and utility functions), **L9** (the simulated expert as a user model), **L1**
-(baseline classifier), **L12** (expert-bias analysis in the report).
+App `project3/`, route `/project3/`. A topic classifier for news articles that can hand an
+article to a human expert instead of answering.
+
+Unlike the first two projects, nothing is trained while a page is loading. `manage.py
+run_project3` runs every experiment once and writes `results/results.json` plus the figures
+under `static/project3/figures/`, both committed, and the view only reads them. Page loads
+are a couple of milliseconds and a reader sees the results without running anything. The
+results carry a hash of the modules that produced them, and the page says so if the code has
+moved on since.
+
+### Lecture 1: the baseline
+
+TF-IDF with bigrams into logistic regression, trained on every label, reaching 0.891 on the
+test set. Its value here is the per-topic breakdown: Sports is easy, Sci/Tech is hard, so the
+classifier has weak regions an expert can be complementary to.
+
+### Lecture 9: the expert as a user model
+
+`project3/experts.py` treats an expert as `p(a | s, theta)`, a distribution over the label
+they would give conditioned on the true topic. Competence varies by topic, which is what
+makes deferral a real decision rather than a fixed policy.
+
+The competence profiles are chosen deliberately. The specialist is strong exactly where the
+classifier is weakest and poor where it is strongest, so gains have to come from deferring
+selectively rather than often. The generalist is uniformly mediocre and better nowhere; it is
+the control, and what the system does with it is the more interesting result.
+
+### Lecture 5: rejection, deferral and the surrogate
+
+Confidence-based rejection is implemented as the baseline the lecture criticises: defer
+whatever the classifier is least sure about, without ever looking at the expert.
+
+The learned alternative follows the lecture's formulation. `project3/defer.py` trains K+1
+scorers on the cost-sensitive softmax cross-entropy surrogate, with the deferral option
+carrying the expert's error plus a query cost. The gradient with respect to the scores is
+`p * sum(w) - w`, derived by hand and checked against finite differences in the tests.
+
+Two decisions were forced by measurement rather than taste. The class answer comes from the
+task 1 classifier, because letting the K+1 model predict the class too produced a markedly
+weaker classifier and made deferral look better than it was. And the query cost is chosen on
+held-out training data, never on the test set, for the same reason project 1 stopped
+selecting its hyperparameter there.
+
+The headline result is not the accuracy number but where the deferral budget goes: at an
+identical deferral rate the learned rule concentrates on the topics where the expert is
+actually better, while confidence-based rejection spreads the same budget almost evenly.
+
+### Lecture 6: active learning
+
+`project3/active.py` starts with no expert labels at all. The query utility targets the
+decision the labels feed, preferring articles where the expert and the classifier are equally
+likely to be right, multiplied by a representativeness term so the budget is not spent on
+outliers. It reaches a given system accuracy with roughly a fifth of the labels random
+querying needs, and beats querying by classifier uncertainty, which finds hard articles but
+says nothing about whether the expert can handle them.
+
+### The report
+
+`project3/report.py` builds the PDF the brief asks for from the committed results, served
+from `/project3/report/`. It is rendered on request rather than committed, so it cannot
+disagree with the numbers on the page.
 
 ## Project 4 — Preference Elicitation User Study
 
-*To be completed when `feature/project-4` is reviewed.* Planned lecture coverage: **L9**
-(Luce models ⇒ Bradley–Terry ranking), **L7** (user-study design, between/within subjects,
-piloting, ethics and consent), **L8** and **L6** (study interface and adaptive item
-selection), **L12** (participant-data ethics).
+Not implemented yet. It will cover lecture 9 (Luce models and the Bradley-Terry extension to
+rankings), lecture 7 (study design, between- and within-subjects, piloting, consent) and
+lecture 8 (the study interface).
