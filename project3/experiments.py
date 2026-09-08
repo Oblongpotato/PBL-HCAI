@@ -29,19 +29,34 @@ SOURCES = ("data.py", "classifier.py", "experts.py", "defer.py", "active.py", "e
 
 
 def code_hash():
-    """A digest over the modules that produce the results."""
+    """A digest over the modules that produce the results.
+
+    Hashing raw bytes would make this depend on line endings, so the stored value would never
+    match on a clone checked out with a different `core.autocrlf`. The staleness banner would
+    then be permanently and wrongly on. Normalise newlines and hash the content instead.
+    """
     digest = hashlib.sha256()
     for name in SOURCES:
-        digest.update((APP_DIR / name).read_bytes())
+        text = (APP_DIR / name).read_text(encoding="utf-8").replace("\r\n", "\n")
+        digest.update(text.encode("utf-8"))
     return digest.hexdigest()[:16]
 
 
+def _git(*arguments):
+    return subprocess.run(
+        ["git", *arguments], cwd=APP_DIR, capture_output=True, text=True, timeout=5, check=True
+    ).stdout.strip()
+
+
 def _git_sha():
+    """The commit the results came from, marked dirty if the tree had uncommitted changes.
+
+    An unmarked SHA is a promise that checking it out reproduces these numbers. Running the
+    experiments against a modified tree breaks that promise silently.
+    """
     try:
-        return subprocess.run(
-            ["git", "rev-parse", "--short", "HEAD"],
-            cwd=APP_DIR, capture_output=True, text=True, timeout=5, check=True,
-        ).stdout.strip()
+        sha = _git("rev-parse", "--short", "HEAD")
+        return f"{sha}-dirty" if _git("status", "--porcelain") else sha
     except Exception:
         return "unknown"
 

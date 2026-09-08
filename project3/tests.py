@@ -141,6 +141,28 @@ class CommittedResultsTests(TestCase):
             curves["proposed"][-1]["system_accuracy"], curves["random"][-1]["system_accuracy"]
         )
 
+    def test_code_hash_ignores_line_endings(self):
+        """The stored hash has to survive a clone with different newline settings.
+
+        Comparing the stored hash to the current one only proves they agree on this machine,
+        which is exactly why the byte-based version shipped: it passed here and failed on
+        every checkout.
+        """
+        import hashlib
+
+        crlf, lf = "\r\n", "\n"
+
+        def digest(line_ending):
+            running = hashlib.sha256()
+            for name in experiments.SOURCES:
+                text = (experiments.APP_DIR / name).read_text(encoding="utf-8")
+                rewritten = text.replace(crlf, lf).replace(lf, line_ending)
+                running.update(rewritten.replace(crlf, lf).encode("utf-8"))
+            return running.hexdigest()[:16]
+
+        self.assertEqual(digest(lf), digest(crlf))
+        self.assertEqual(digest(lf), experiments.code_hash())
+
     def test_results_carry_provenance(self):
         stamp = self.results["generated"]
         self.assertEqual(stamp["code_hash"], experiments.code_hash())
