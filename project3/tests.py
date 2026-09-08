@@ -180,6 +180,20 @@ class PageTests(TestCase):
         ):
             self.assertContains(response, heading)
 
+    def test_report_downloads_as_a_pdf(self):
+        # The brief requires a report reachable from the interface, so this is the deliverable
+        # that blocked the merge.
+        response = self.client.get(reverse("project3:report"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"], "application/pdf")
+        self.assertIn("attachment", response.headers["Content-Disposition"])
+        body = b"".join(response.streaming_content)
+        self.assertTrue(body.startswith(b"%PDF"))
+        self.assertGreater(len(body), 50_000)
+
+    def test_the_page_links_to_the_report(self):
+        self.assertContains(self.client.get(reverse("project3:index")), reverse("project3:report"))
+
     def test_page_touches_no_database(self):
         # Everything comes from the committed results, so repeated loads stay cheap.
         with self.assertNumQueries(0):

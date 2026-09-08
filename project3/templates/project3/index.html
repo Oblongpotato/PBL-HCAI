@@ -35,9 +35,18 @@
         {% include "project3/_expert.html" %}
         {% include "project3/_defer.html" %}
         {% include "project3/_active.html" %}
-    {% endif %}
 
-    {% if results %}
+        <section class="panel">
+            <h2>6. The report</h2>
+            <p class="hint">
+                The full write-up: what was built, why each design choice was made, and what the
+                numbers above mean, including the case where deferring turns out not to pay.
+            </p>
+            <p>
+                <a class="download" href="{% url 'project3:report' %}">Download the report (PDF)</a>
+            </p>
+        </section>
+
         <p class="provenance">
             Results generated {{ results.generated.utc }} from commit
             <code>{{ results.generated.git_sha }}</code>.

@@ -1,6 +1,9 @@
+from io import BytesIO
+
+from django.http import FileResponse
 from django.shortcuts import render
 
-from . import experiments
+from . import experiments, report
 
 
 def index(request):
@@ -17,4 +20,14 @@ def index(request):
             "results": results,
             "stale": bool(results) and experiments.is_stale(results),
         },
+    )
+
+
+def report_pdf(request):
+    """The report the brief asks for, built from the committed results on each request."""
+    return FileResponse(
+        BytesIO(report.build()),
+        as_attachment=True,
+        filename="project3-report.pdf",
+        content_type="application/pdf",
     )

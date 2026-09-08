@@ -61,3 +61,14 @@
     font-size: 0.9rem;
 }
 .p3 .provenance { color: #888; font-size: 0.8rem; margin-top: 18px; }
+
+.p3 a.download {
+    display: inline-block;
+    background: #275CB2;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 3px;
+    text-decoration: none;
+    font-size: 1rem;
+}
+.p3 a.download:hover { opacity: 0.9; }
