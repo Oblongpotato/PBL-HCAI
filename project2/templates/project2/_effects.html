@@ -1,0 +1,63 @@
+<section class="panel">
+    <h2>5. Feature effect plots</h2>
+
+    <p class="hint">
+        How does one measurement move the predicted probability of each species, for
+        <strong>{{ family_label|lower }} at &lambda;&nbsp;=&nbsp;{{ lam }}</strong>? Both curves are
+        computed here rather than taken from a library.
+    </p>
+
+    <form method="get" class="selector">
+        <input type="hidden" name="family" value="{{ family }}">
+        <input type="hidden" name="lam" value="{{ lam }}">
+        <input type="hidden" name="row" value="{{ row }}">
+        <input type="hidden" name="target" value="{{ target }}">
+
+        <div class="field">
+            <label for="feature">Feature</label>
+            <select id="feature" name="feature" onchange="this.form.submit()">
+                {% for name in summary.numeric_features %}
+                    <option value="{{ name }}" {% if name == feature %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="field">
+            <label>&nbsp;</label>
+            <noscript><button type="submit">Show</button></noscript>
+        </div>
+    </form>
+
+    <div class="effects">
+        <figure class="plot">
+            <img src="{{ pdp_plot }}" alt="Partial dependence plot">
+            <figcaption>
+                <strong>PDP</strong> &mdash; the average prediction when every penguin is given this
+                value of {{ feature }}. It marginalises the other features, so it probes the model
+                with combinations that may not exist in reality.
+            </figcaption>
+        </figure>
+
+        <figure class="plot">
+            <img src="{{ ale_plot }}" alt="Accumulated local effects plot">
+            <figcaption>
+                <strong>ALE</strong> &mdash; local differences accumulated across intervals, using
+                only penguins that really occur in each interval. Immune to the correlation between
+                bill, flipper and mass that makes the PDP unreliable here.
+            </figcaption>
+        </figure>
+    </div>
+
+    <p class="derivative-note">
+        {% if exact_available %}
+            The dotted overlay is the <strong>exact</strong> derivative: for a multinomial logistic
+            model <code>&part;P&#8321;/&part;x&#8332; = P&#8321;(w&#8321;&#8332; &minus; &Sigma;&#8342; P&#8342;w&#8342;&#8332;)</code>,
+            corrected for the standardisation applied before fitting. It agrees with the
+            discretised estimate, which is the check that the implementation is right.
+        {% else %}
+            A decision tree is piecewise constant: its derivative is zero almost everywhere, with
+            jumps at the split thresholds. There is no exact derivative to integrate, so ALE for a
+            tree must be estimated by discretisation &mdash; which is exactly the difference the
+            project asks about.
+        {% endif %}
+    </p>
+</section>

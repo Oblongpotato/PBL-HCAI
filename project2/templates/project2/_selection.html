@@ -1,0 +1,77 @@
+<section class="panel">
+    <h2>2. How much complexity will you accept?</h2>
+
+    <p class="hint">
+        Every model below was fitted at a different <code>{{ fit_regulariser }}</code>. The slider
+        does something different: it weighs the complexity term when choosing <em>between</em> those
+        already-fitted models, by maximising
+        <code>accuracy &minus; &lambda; &times; &Omega;(f)</code>.
+        &Omega;(f) counts {{ complexity_label }}.
+    </p>
+
+    <form method="get" class="selector">
+        <div class="field">
+            <label>Model class</label>
+            {% for key, label in families %}
+                <label class="radio">
+                    <input type="radio" name="family" value="{{ key }}"
+                           {% if key == family %}checked{% endif %}
+                           onchange="this.form.submit()"> {{ label }}
+                </label>
+            {% endfor %}
+        </div>
+
+        <div class="field grow">
+            <label for="lam">&lambda; = <strong id="lam-value">{{ lam }}</strong></label>
+            <input type="range" id="lam" name="lam" min="0" max="{{ lambda_max }}" step="0.001"
+                   value="{{ lam }}"
+                   oninput="document.getElementById('lam-value').textContent = this.value"
+                   onchange="this.form.submit()">
+            <span class="range-ends">0 &mdash; accuracy only &nbsp;&nbsp;&nbsp; {{ lambda_max }} &mdash; simplicity matters most</span>
+        </div>
+
+        {% if feature %}<input type="hidden" name="feature" value="{{ feature }}">{% endif %}
+        {% if row %}<input type="hidden" name="row" value="{{ row }}">{% endif %}
+        {% if target %}<input type="hidden" name="target" value="{{ target }}">{% endif %}
+        <noscript><button type="submit">Apply</button></noscript>
+    </form>
+
+    <p class="objective">
+        Selected: <code>{{ fit_regulariser }} = {{ selected.value }}</code> &mdash;
+        accuracy {{ selected.accuracy|floatformat:4 }} &minus;
+        {{ lam }} &times; {{ selected.complexity }} =
+        <strong>{{ objective|floatformat:4 }}</strong>
+    </p>
+
+    <details class="candidates">
+        <summary>All {{ candidates|length }} candidate models</summary>
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>{{ fit_regulariser }}</th><th>&Omega;(f)</th>
+                        <th>test accuracy</th><th>accuracy &minus; &lambda;&Omega;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for candidate in candidates %}
+                        <tr class="{% if candidate.chosen %}chosen{% endif %}">
+                            <td>{{ candidate.value }}</td>
+                            <td>{{ candidate.complexity }}</td>
+                            <td>{{ candidate.accuracy|floatformat:4 }}</td>
+                            <td>{{ candidate.objective|floatformat:4 }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </details>
+
+    <figure class="plot">
+        <img src="{{ tradeoff_plot }}" alt="Accuracy against complexity">
+        <figcaption>
+            Where the accuracy curve flattens, extra complexity buys nothing &mdash; the region in
+            which a simple model is as good as a complicated one.
+        </figcaption>
+    </figure>
+</section>

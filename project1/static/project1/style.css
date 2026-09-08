@@ -70,3 +70,13 @@
 .p1 table.history th, .p1 table.history td { border: 1px solid #e2e2e2; padding: 4px 10px; text-align: left; }
 .p1 table.history th { background: #f4f4f4; }
 .p1 table.history tr.auto-row { background: #fdf6f6; }
+
+.p1 .training-error {
+    border-left: 4px solid #b23b3b;
+    background: #fdf1f1;
+    padding: 10px 14px;
+    margin: 12px 0 0;
+    font-size: 0.9rem;
+}
+
+.p1 .headline { font-size: 1.05rem; margin: 6px 0; }

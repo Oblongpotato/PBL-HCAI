@@ -19,7 +19,7 @@
                 <thead>
                     <tr>
                         <th>When</th><th>Decided by</th><th>Model</th><th>Best</th>
-                        <th>Score</th><th>Test fraction</th><th>Seed</th>
+                        <th>CV score</th><th>Test score</th><th>Test fraction</th><th>Seed</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -29,6 +29,7 @@
                             <td>{% if run.automated %}the app{% else %}you{% endif %}</td>
                             <td>{{ run.model_key }}</td>
                             <td>{{ run.hyperparameter }} = {{ run.best_value|floatformat:"-3" }}</td>
+                            <td>{{ run.selection_score|floatformat:4 }}</td>
                             <td>{{ run.scoring }} {{ run.best_score|floatformat:4 }}</td>
                             <td>{{ run.test_size }}</td>
                             <td>{{ run.random_state }}</td>

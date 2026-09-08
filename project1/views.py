@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from django.shortcuts import redirect, render
 
 from utils import datasets
@@ -7,11 +9,16 @@ from .forms import DatasetUploadForm, TrainingForm, VisualizationForm
 from .models import Dataset, TrainingRun
 
 SESSION_KEY = "project1_dataset"
+_TRAINING_FAILED = "This dataset could not be trained on: {error}"
 
 
 def _current_dataset(request):
-    """The dataset the user is working on, or None."""
-    return Dataset.objects.filter(pk=request.session.get(SESSION_KEY)).first()
+    """The dataset the user is working on, or None if it is gone from disk."""
+    dataset = Dataset.objects.filter(pk=request.session.get(SESSION_KEY)).first()
+    if dataset and not Path(dataset.file.path).exists():
+        request.session.pop(SESSION_KEY, None)
+        return None
+    return dataset
 
 
 def _store(request, upload, task_override):
@@ -19,13 +26,15 @@ def _store(request, upload, task_override):
     frame = datasets.read_csv(upload)
     frame, dropped = datasets.drop_id_columns(frame)
     summary = datasets.describe(frame, dropped)
+    task = task_override or summary["task"]
+    datasets.validate_trainable(frame, task)
 
     upload.seek(0)
     dataset = Dataset.objects.create(
         name=upload.name,
         file=upload,
         target=summary["target"],
-        task=task_override or summary["task"],
+        task=task,
         n_rows=summary["n_rows"],
         n_features=summary["n_features"],
         dropped_columns=dropped,
@@ -39,8 +48,7 @@ def _context(dataset, frame=None, **extra):
     context = {"dataset": dataset, "upload_form": DatasetUploadForm()}
     if dataset:
         frame = dataset.load() if frame is None else frame
-        summary = datasets.describe(frame, dataset.dropped_columns)
-        summary["task"] = dataset.task
+        summary = datasets.describe(frame, dataset.dropped_columns, task=dataset.task)
         context["summary"] = summary
         context["warnings"] = datasets.quality_warnings(frame, dataset.task)
         context.setdefault("visualization_form", VisualizationForm(summary["numeric_features"]))
@@ -79,15 +87,18 @@ def visualize(request):
 
     plot = None
     if form.is_valid():
-        url, caption = plots.build(
-            frame,
-            dataset.target,
-            dataset.task,
-            form.cleaned_data["kind"],
-            form.cleaned_data["x"],
-            form.cleaned_data["y"],
-        )
-        plot = {"url": url, "caption": caption}
+        try:
+            url, caption = plots.build(
+                frame,
+                dataset.target,
+                dataset.task,
+                form.cleaned_data["kind"],
+                form.cleaned_data["x"],
+                form.cleaned_data["y"],
+            )
+            plot = {"url": url, "caption": caption}
+        except (ValueError, TypeError) as error:
+            form.add_error(None, f"That plot could not be drawn: {error}")
 
     return render(
         request,
@@ -108,8 +119,13 @@ def train(request):
         return render(request, "project1/index.html", _context(dataset, frame=frame, training_form=form))
 
     choice = form.cleaned_data
-    result = _sweep(dataset, frame, choice["model"], choice["grid"], choice["test_size"],
-                    choice["random_state"], choice["scoring"], automated=False)
+    try:
+        result = _sweep(dataset, frame, choice["model"], choice["grid"], choice["test_size"],
+                        choice["random_state"], choice["scoring"], automated=False)
+    except (ValueError, TypeError) as error:
+        form.add_error(None, _TRAINING_FAILED.format(error=error))
+        result = None
+
     return render(
         request,
         "project1/index.html",
@@ -131,12 +147,13 @@ def _sweep(dataset, frame, model_key, values, test_size, random_state, scoring, 
         random_state=random_state,
         scoring=scoring,
         best_value=result["best_value"],
+        selection_score=result["selection_score"],
         best_score=result["best_score"],
         automated=automated,
     )
     result["curve"] = plots.score_curve(result["values"], result["scores"],
                                         result["hyperparameter"], result["score_label"],
-                                        result["best_value"])
+                                        result["best_value"], result["best_score"])
     result["automated"] = automated
     return result
 
@@ -149,6 +166,12 @@ def automl(request):
 
     frame = dataset.load()
     choice = ml.automatic_choice(dataset.task)
-    result = _sweep(dataset, frame, choice["model_key"], choice["values"], choice["test_size"],
-                    choice["random_state"], choice["scoring"], automated=True)
-    return render(request, "project1/index.html", _context(dataset, frame=frame, result=result))
+    extra = {}
+    try:
+        extra["result"] = _sweep(dataset, frame, choice["model_key"], choice["values"],
+                                 choice["test_size"], choice["random_state"], choice["scoring"],
+                                 automated=True)
+    except (ValueError, TypeError) as error:
+        extra["training_error"] = _TRAINING_FAILED.format(error=error)
+
+    return render(request, "project1/index.html", _context(dataset, frame=frame, **extra))

@@ -1,0 +1,17 @@
+<section class="panel">
+    <h2>1. The data</h2>
+    <dl class="facts">
+        <dt>Dataset</dt>
+        <dd>
+            Palmer Penguins &mdash; {{ summary.n_rows }} complete rows of {{ summary.n_total }}
+            ({{ summary.n_dropped }} dropped for missing values), {{ summary.n_test }} held out for testing.
+        </dd>
+        <dt>Target</dt>
+        <dd>
+            {{ summary.target }} &mdash;
+            {% for name, count in summary.distribution.items %}{{ name }} ({{ count }}){% if not forloop.last %}, {% endif %}{% endfor %}
+        </dd>
+        <dt>Numeric features</dt><dd>{{ summary.numeric_features|join:", " }}</dd>
+        <dt>Categorical features</dt><dd>{{ summary.categorical_features|join:", " }}</dd>
+    </dl>
+</section>

@@ -1,0 +1,68 @@
+/* The shared .box is absolutely centred, which only works for short pages.
+   This page scrolls, so it is laid out in normal flow instead. */
+.box.p2 {
+    position: static;
+    transform: none;
+    grid-template-rows: auto;
+    width: auto;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 10px 24px 24px;
+    box-sizing: border-box;
+}
+
+.p2 button { width: auto; padding: 0 22px; font-size: 16px; height: 38px; margin: 0; }
+
+.p2 .lead { color: #444; line-height: 1.5; }
+
+.p2 .panel {
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 18px 0;
+    background: #fff;
+}
+
+.p2 .panel h2 { margin-top: 0; font-size: 1.15rem; }
+.p2 .panel h3 { font-size: 1rem; margin-bottom: 4px; }
+
+.p2 .hint { color: #666; font-size: 0.85rem; }
+
+.p2 .facts { display: grid; grid-template-columns: max-content 1fr; gap: 4px 18px; margin: 0 0 12px; }
+.p2 .facts dt { font-weight: 600; color: #555; }
+.p2 .facts dd { margin: 0; }
+
+.p2 .plot { margin: 14px 0 0; text-align: center; }
+.p2 .plot img { max-width: 100%; border: 1px solid #e2e2e2; border-radius: 4px; }
+.p2 .plot figcaption { color: #666; font-size: 0.85rem; margin-top: 6px; }
+
+.p2 .table-scroll { overflow-x: auto; }
+.p2 table { border-collapse: collapse; font-size: 0.85rem; width: 100%; }
+.p2 th, .p2 td { border: 1px solid #e2e2e2; padding: 4px 10px; text-align: left; }
+.p2 th { background: #f4f4f4; }
+
+.p2 .back { margin-top: 24px; font-size: 0.9rem; }
+
+.p2 .selector { display: flex; gap: 28px; align-items: flex-start; flex-wrap: wrap; margin: 14px 0; }
+.p2 .selector .field { display: flex; flex-direction: column; gap: 4px; }
+.p2 .selector .field.grow { flex: 1 1 320px; }
+.p2 .selector label { font-size: 0.85rem; color: #555; }
+.p2 .selector label.radio { color: #222; font-size: 0.9rem; }
+.p2 .selector input[type="range"] { width: 100%; }
+.p2 .range-ends { display: flex; justify-content: space-between; color: #888; font-size: 0.75rem; }
+.p2 .objective { background: #f6f8fc; border-left: 4px solid #275CB2; padding: 8px 14px; font-size: 0.9rem; }
+
+.p2 .candidates { margin: 12px 0; font-size: 0.9rem; }
+.p2 .candidates summary { cursor: pointer; color: #275CB2; }
+.p2 .candidates table { margin-top: 8px; }
+.p2 tr.chosen { background: #eef3ff; font-weight: 600; }
+
+.p2 tr.original { background: #f7f7f7; }
+.p2 td.changed { background: #fff6e0; }
+.p2 td.changed .delta { color: #a06a00; font-size: 0.75rem; display: block; }
+.p2 td.empty { color: #666; font-style: italic; text-align: center; padding: 14px; }
+.p2 .selector select, .p2 .selector input[type="number"] { padding: 5px; font-size: 0.9rem; }
+
+.p2 .effects { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; }
+.p2 .effects figcaption { text-align: left; }
+.p2 .derivative-note { background: #f6f8fc; border-left: 4px solid #275CB2; padding: 10px 14px; font-size: 0.88rem; }

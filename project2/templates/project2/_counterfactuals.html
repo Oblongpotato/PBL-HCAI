@@ -1,0 +1,73 @@
+<section class="panel">
+    <h2>4. Counterfactuals</h2>
+
+    <p class="hint">
+        What would have to be different about this penguin for the model to call it something
+        else? Candidates are sampled around it, kept only if
+        <strong>{{ family_label|lower }} at &lambda;&nbsp;=&nbsp;{{ lam }}</strong> predicts the
+        target, then ranked by MAD-weighted L1 distance &mdash; each feature measured against its
+        own spread, so millimetres and grams are comparable.
+    </p>
+
+    <form method="get" class="selector">
+        <input type="hidden" name="family" value="{{ family }}">
+        <input type="hidden" name="lam" value="{{ lam }}">
+        {% if feature %}<input type="hidden" name="feature" value="{{ feature }}">{% endif %}
+
+        <div class="field">
+            <label for="row">Penguin (row)</label>
+            <input type="number" id="row" name="row" min="0" max="{{ summary.n_rows|add:'-1' }}"
+                   value="{{ row }}">
+        </div>
+        <div class="field">
+            <label for="target">Target species</label>
+            <select id="target" name="target">
+                {% for name in species %}
+                    <option value="{{ name }}" {% if name == target %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="field">
+            <label>&nbsp;</label>
+            <button type="submit">Find counterfactuals</button>
+        </div>
+    </form>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    {% for name in features %}<th>{{ name }}</th>{% endfor %}
+                    <th>distance</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="original">
+                    <th>this penguin &mdash; {{ predicted }}</th>
+                    {% for value in original_cells %}<td>{{ value }}</td>{% endfor %}
+                    <td>&mdash;</td>
+                </tr>
+                {% for candidate in counterfactuals %}
+                    <tr>
+                        <th>{{ target }} #{{ forloop.counter }}</th>
+                        {% for cell in candidate.cells %}
+                            <td class="{% if cell.changed %}changed{% endif %}">
+                                {{ cell.value }}
+                                {% if cell.changed and cell.delta %}<span class="delta">{{ cell.delta }}</span>{% endif %}
+                            </td>
+                        {% endfor %}
+                        <td>{{ candidate.distance|floatformat:2 }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="{{ features|length|add:'2' }}" class="empty">
+                            No counterfactual found for {{ target }} even after widening the search.
+                            This model does not put {{ target }} anywhere near this penguin.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>

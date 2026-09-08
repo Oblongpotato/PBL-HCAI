@@ -17,7 +17,7 @@ from sklearn.metrics import (
     mean_squared_error,
     r2_score,
 )
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import KFold, StratifiedKFold, train_test_split
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
@@ -117,6 +117,8 @@ SCORES = {
     "mae": {"label": "Mean absolute error", "task": "regression", "fn": mean_absolute_error, "maximise": False},
 }
 
+CV_FOLDS = 5
+
 DEFAULT_MODEL = {"classification": "tree", "regression": "ridge"}
 DEFAULT_SCORE = {"classification": "accuracy", "regression": "r2"}
 
@@ -139,8 +141,26 @@ def _preprocessor(X):
     return ColumnTransformer(steps)
 
 
+def _splitter(task, y, random_state):
+    """Folds for hyperparameter selection, degrading gracefully on tiny datasets."""
+    if task == "classification":
+        folds = min(CV_FOLDS, int(y.value_counts().min()))
+        if folds >= 2:
+            return StratifiedKFold(n_splits=folds, shuffle=True, random_state=random_state)
+    return KFold(n_splits=max(2, min(CV_FOLDS, len(y))), shuffle=True, random_state=random_state)
+
+
+def _build(spec, value, X):
+    return Pipeline([("prepare", _preprocessor(X)), ("model", spec["factory"](value))])
+
+
 def run_sweep(frame, target, task, model_key, values, test_size, random_state, scoring):
-    """Split, fit one model per hyperparameter value, score on the held-out test set."""
+    """Lecture 1's pipeline, with the hyperparameter chosen without touching the test set.
+
+    The test set is held out first and used once, for the final number. The hyperparameter
+    is selected by cross-validation inside the training set, so the reported score is not
+    the score that did the selecting.
+    """
     spec = MODELS[model_key]
     score = SCORES[scoring]
 
@@ -152,25 +172,40 @@ def run_sweep(frame, target, task, model_key, values, test_size, random_state, s
         X, y, test_size=test_size, random_state=random_state, stratify=stratify
     )
 
-    results, best_index, best_prediction = [], 0, None
+    splitter = _splitter(task, y_train, random_state)
+    selection, best_index = [], 0
     for index, value in enumerate(values):
-        pipeline = Pipeline([("prepare", _preprocessor(X)), ("model", spec["factory"](value))])
-        pipeline.fit(X_train, y_train)
-        prediction = pipeline.predict(X_test)
-        results.append(float(score["fn"](y_test, prediction)))
+        folds = []
+        for train_rows, validation_rows in splitter.split(X_train, y_train):
+            pipeline = _build(spec, value, X)
+            pipeline.fit(X_train.iloc[train_rows], y_train.iloc[train_rows])
+            prediction = pipeline.predict(X_train.iloc[validation_rows])
+            folds.append(float(score["fn"](y_train.iloc[validation_rows], prediction)))
+        selection.append(sum(folds) / len(folds))
 
-        improved = results[index] > results[best_index] if score["maximise"] else results[index] < results[best_index]
+        improved = (
+            selection[index] > selection[best_index]
+            if score["maximise"]
+            else selection[index] < selection[best_index]
+        )
         if index == 0 or improved:
-            best_index, best_prediction = index, prediction
+            best_index = index
+
+    final = _build(spec, values[best_index], X)
+    final.fit(X_train, y_train)
+    prediction = final.predict(X_test)
+    test_score = float(score["fn"](y_test, prediction))
 
     summary = {
         "values": list(values),
-        "scores": results,
+        "scores": selection,
         "best_value": values[best_index],
-        "best_score": results[best_index],
+        "selection_score": selection[best_index],
+        "best_score": test_score,
         "hyperparameter": spec["hyperparameter"],
         "model_label": spec["label"],
         "score_label": score["label"],
+        "n_folds": splitter.get_n_splits(),
         "n_train": len(X_train),
         "n_test": len(X_test),
     }
@@ -179,7 +214,7 @@ def run_sweep(frame, target, task, model_key, values, test_size, random_state, s
         labels = sorted(y.astype(str).unique())
         summary["labels"] = labels
         matrix = confusion_matrix(
-            y_test.astype(str), best_prediction.astype(str), labels=labels
+            y_test.astype(str), prediction.astype(str), labels=labels
         ).tolist()
         summary["confusion"] = list(zip(labels, matrix))
     return summary
