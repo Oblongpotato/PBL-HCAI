@@ -1,0 +1,2 @@
+# Keep python source LF in the repository so tooling sees identical content everywhere.
+*.py text eol=lf

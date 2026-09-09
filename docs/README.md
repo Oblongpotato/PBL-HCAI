@@ -21,6 +21,7 @@ Shared across all projects:
 |---|---|---|
 | 1 | any uploaded CSV | first row holds the feature names, last column is the target; developed against the course iris file |
 | 2 | `project2/data/penguins.csv` | exported once from the `palmerpenguins` package and committed, so the numbers are reproducible and the app needs no download at runtime |
+| 3 | `project3/data/agnews_*.csv` | a stratified subsample of AG News, 2000 training and 500 test articles per topic, drawn once with a fixed seed and committed for the same reason |
 
 The tests do not read the course material, since it is not committed. `project1/tests.py`
 builds its iris frame from `sklearn.datasets.load_iris`, which is the same data.
@@ -168,10 +169,67 @@ only the discretised estimate exists for it. The page says which case applies.
 
 ## Project 3 — Active Learning for Learning-to-Defer
 
-Not implemented yet. It will cover lecture 5 (rejection and deferral losses, the (K+1)-class
-scorer, the cost-sensitive softmax surrogate), lecture 6 (pool-based active learning and
-query strategies), lecture 9 (the simulated expert as a user model) and lecture 1 (the
-baseline classifier).
+App `project3/`, route `/project3/`. A topic classifier for news articles that can hand an
+article to a human expert instead of answering.
+
+Unlike the first two projects, nothing is trained while a page is loading. `manage.py
+run_project3` runs every experiment once and writes `results/results.json` plus the figures
+under `static/project3/figures/`, both committed, and the view only reads them. Page loads
+are a couple of milliseconds and a reader sees the results without running anything. The
+results carry a hash of the modules that produced them, and the page says so if the code has
+moved on since.
+
+### Lecture 1: the baseline
+
+TF-IDF with bigrams into logistic regression, trained on every label, reaching 0.891 on the
+test set. Its value here is the per-topic breakdown: Sports is easy, Sci/Tech is hard, so the
+classifier has weak regions an expert can be complementary to.
+
+### Lecture 9: the expert as a user model
+
+`project3/experts.py` treats an expert as `p(a | s, theta)`, a distribution over the label
+they would give conditioned on the true topic. Competence varies by topic, which is what
+makes deferral a real decision rather than a fixed policy.
+
+The competence profiles are chosen deliberately. The specialist is strong exactly where the
+classifier is weakest and poor where it is strongest, so gains have to come from deferring
+selectively rather than often. The generalist is uniformly mediocre and better nowhere; it is
+the control, and what the system does with it is the more interesting result.
+
+### Lecture 5: rejection, deferral and the surrogate
+
+Confidence-based rejection is implemented as the baseline the lecture criticises: defer
+whatever the classifier is least sure about, without ever looking at the expert.
+
+The learned alternative follows the lecture's formulation. `project3/defer.py` trains K+1
+scorers on the cost-sensitive softmax cross-entropy surrogate, with the deferral option
+carrying the expert's error plus a query cost. The gradient with respect to the scores is
+`p * sum(w) - w`, derived by hand and checked against finite differences in the tests.
+
+Two decisions were forced by measurement rather than taste. The class answer comes from the
+task 1 classifier, because letting the K+1 model predict the class too produced a markedly
+weaker classifier and made deferral look better than it was. And the query cost is chosen on
+held-out training data, never on the test set, for the same reason project 1 stopped
+selecting its hyperparameter there.
+
+The headline result is not the accuracy number but where the deferral budget goes: at an
+identical deferral rate the learned rule concentrates on the topics where the expert is
+actually better, while confidence-based rejection spreads the same budget almost evenly.
+
+### Lecture 6: active learning
+
+`project3/active.py` starts with no expert labels at all. The query utility targets the
+decision the labels feed, preferring articles where the expert and the classifier are equally
+likely to be right, multiplied by a representativeness term so the budget is not spent on
+outliers. It reaches a given system accuracy with roughly a fifth of the labels random
+querying needs, and beats querying by classifier uncertainty, which finds hard articles but
+says nothing about whether the expert can handle them.
+
+### The report
+
+`project3/report.py` builds the PDF the brief asks for from the committed results, served
+from `/project3/report/`. It is rendered on request rather than committed, so it cannot
+disagree with the numbers on the page.
 
 ## Project 4 — Preference Elicitation User Study
 

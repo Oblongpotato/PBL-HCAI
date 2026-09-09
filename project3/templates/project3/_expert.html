@@ -1,0 +1,48 @@
+{% load static %}
+<section class="panel">
+    <h2>3. The simulated experts</h2>
+    <p class="hint">
+        Each expert is a user model: given the true topic, they answer correctly with a probability
+        that depends on that topic, and otherwise pick one of the other three. Competence varies by
+        region of the input space, which is the case deferral exists for.
+    </p>
+
+    {% for expert in results.experts.reports %}
+        <div class="expert">
+            <h3>{{ expert.label }} &mdash; overall accuracy {{ expert.accuracy }}</h3>
+            <p class="hint">{{ expert.description }}</p>
+            <div class="table-scroll">
+                <table class="compact">
+                    <thead>
+                        <tr><th>Topic</th><th>expert</th><th>classifier</th><th>better</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for topic, row in expert.per_topic.items %}
+                            <tr class="{% if row.expert_better %}expert-wins{% endif %}">
+                                <th>{{ topic }}</th>
+                                <td>{{ row.expert }}</td>
+                                <td>{{ row.classifier }}</td>
+                                <td>{% if row.expert_better %}expert{% else %}classifier{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <p class="hint">
+                {% if expert.beats_classifier_on %}
+                    Beats the classifier on {{ expert.beats_classifier_on|join:" and " }}, and is well
+                    behind it elsewhere. Deferring everything to this expert would be much worse than
+                    deferring nothing; the gain has to come from deferring selectively.
+                {% else %}
+                    Never beats the classifier on any topic, so there is nothing to gain by deferring
+                    to this one. It is here as the contrast case.
+                {% endif %}
+            </p>
+        </div>
+    {% endfor %}
+
+    <figure class="plot">
+        <img src="{% static results.experts.figure %}" alt="Expert accuracy per topic">
+        <figcaption>Where each party is stronger, topic by topic.</figcaption>
+    </figure>
+</section>

@@ -1,5 +1,33 @@
-from django.http import HttpResponse
+from io import BytesIO
+
+from django.http import FileResponse
+from django.shortcuts import render
+
+from . import experiments, report
 
 
 def index(request):
-    return HttpResponse("Active Learning for Learning-to-Defer — coming soon.")
+    """Display the precomputed experiment results.
+
+    Nothing is trained here. `manage.py run_project3` produces results.json and the figures,
+    both of which are committed, so this view only reads them.
+    """
+    results = experiments.load()
+    return render(
+        request,
+        "project3/index.html",
+        {
+            "results": results,
+            "stale": bool(results) and experiments.is_stale(results),
+        },
+    )
+
+
+def report_pdf(request):
+    """The report the brief asks for, built from the committed results on each request."""
+    return FileResponse(
+        BytesIO(report.build()),
+        as_attachment=True,
+        filename="project3-report.pdf",
+        content_type="application/pdf",
+    )

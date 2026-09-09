@@ -1,0 +1,74 @@
+/* The shared .box is absolutely centred, which only works for short pages.
+   This page scrolls, so it is laid out in normal flow instead. */
+.box.p3 {
+    position: static;
+    transform: none;
+    grid-template-rows: auto;
+    width: auto;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 10px 24px 24px;
+    box-sizing: border-box;
+}
+
+.p3 button { width: auto; padding: 0 22px; font-size: 16px; height: 38px; margin: 0; }
+
+.p3 .lead { color: #444; line-height: 1.5; }
+
+.p3 .panel {
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 18px 0;
+    background: #fff;
+}
+
+.p3 .panel h2 { margin-top: 0; font-size: 1.15rem; }
+.p3 .panel h3 { font-size: 1rem; margin-bottom: 2px; }
+
+.p3 .hint { color: #666; font-size: 0.85rem; }
+.p3 .headline { font-size: 1.05rem; }
+
+.p3 .facts { display: grid; grid-template-columns: max-content 1fr; gap: 6px 18px; margin: 0; }
+.p3 .facts dt { font-weight: 600; color: #555; }
+.p3 .facts dd { margin: 0; }
+.p3 .facts .example { color: #444; font-style: italic; }
+
+.p3 .table-scroll { overflow-x: auto; }
+.p3 table.compact { border-collapse: collapse; font-size: 0.85rem; margin: 10px 0; }
+.p3 table.compact th, .p3 table.compact td {
+    border: 1px solid #e2e2e2; padding: 4px 12px; text-align: left;
+}
+.p3 table.compact thead th { background: #f4f4f4; }
+.p3 tr.expert-wins { background: #eef7ee; }
+
+.p3 .expert { border-top: 1px solid #eee; padding-top: 12px; margin-top: 14px; }
+.p3 .expert:first-of-type { border-top: none; margin-top: 0; }
+
+.p3 .plot { margin: 14px 0 0; text-align: center; }
+.p3 .plot img { max-width: 100%; border: 1px solid #e2e2e2; border-radius: 4px; }
+.p3 .plot figcaption { color: #666; font-size: 0.85rem; margin-top: 6px; text-align: left; }
+
+.p3 .back { margin-top: 24px; font-size: 0.9rem; }
+
+.p3 tr.highlight { background: #eef3ff; font-weight: 600; }
+.p3 .figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; }
+
+.p3 .stale {
+    border-left: 4px solid #e0a800;
+    background: #fff8e5;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+}
+.p3 .provenance { color: #888; font-size: 0.8rem; margin-top: 18px; }
+
+.p3 a.download {
+    display: inline-block;
+    background: #275CB2;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 3px;
+    text-decoration: none;
+    font-size: 1rem;
+}
+.p3 a.download:hover { opacity: 0.9; }
