@@ -29,7 +29,9 @@ class Participant(models.Model):
     finished_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        ordering = ["started_at"]
+        # Sessions started in the same clock tick share a timestamp, so the primary key is
+        # the only stable tiebreak. Ordering on started_at alone is not deterministic.
+        ordering = ["started_at", "id"]
 
     def __str__(self):
         return f"participant {self.token}"

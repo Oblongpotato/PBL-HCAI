@@ -188,15 +188,15 @@ class InterfaceTests(TestCase):
         seen = []
         for _ in range(4):
             self.client.post(reverse("project4:consent"), {"consent": "on"})
-            seen.append(Participant.objects.latest("started_at").first_condition)
+            seen.append(Participant.objects.order_by("id").last().first_condition)
             self.client.session.flush()
-        self.assertTrue(all(seen[i] != seen[i + 1] for i in range(len(seen) - 1)))
+        self.assertTrue(all(seen[i] != seen[i + 1] for i in range(len(seen) - 1)), seen)
         self.assertEqual(seen.count(PAIRWISE), seen.count(RANKING))
 
     def _walk(self):
         """Answer every task the way a participant would, and return the participant."""
         self.client.post(reverse("project4:consent"), {"consent": "on"})
-        participant = Participant.objects.latest("started_at")
+        participant = Participant.objects.order_by("id").last()
         while self.client.get(reverse("project4:task")).status_code == 200:
             task = ElicitationTask.objects.filter(
                 participant=participant, response__isnull=True
@@ -208,6 +208,43 @@ class InterfaceTests(TestCase):
                 payload = {f"rank_{f}": str(i + 1) for i, f in enumerate(films)}
             self.client.post(reverse("project4:task"), payload)
         return participant
+
+    def test_the_ranking_page_offers_one_dropdown_per_film(self):
+        # The films rendered but the rank fields did not, because the template tried to match
+        # them by name with a filter chain that silently produced an empty string.
+        self.client.post(reverse("project4:consent"), {"consent": "on"})
+        participant = Participant.objects.order_by("id").last()
+        while True:
+            response = self.client.get(reverse("project4:task"))
+            self.assertEqual(response.status_code, 200)
+            pending = ElicitationTask.objects.filter(
+                participant=participant, response__isnull=True
+            ).first()
+            if pending.condition == RANKING:
+                body = response.content.decode()
+                self.assertEqual(body.count("<select"), study.SLATE_SIZE[RANKING])
+                for rank in range(1, study.SLATE_SIZE[RANKING] + 1):
+                    self.assertIn(f'value="{rank}"', body)
+                return
+            self.client.post(
+                reverse("project4:task"), {"choice": str(pending.film_indices[0])}
+            )
+
+    def test_no_template_internals_leak_into_the_page(self):
+        # `block` is a Django tag name, so a context variable called `block` renders the
+        # BlockNode's repr into the page. Status-code assertions never see this.
+        self.client.post(reverse("project4:consent"), {"consent": "on"})
+        for url in (reverse("project4:index"), reverse("project4:task")):
+            body = self.client.get(url).content.decode()
+            for leak in ("Block Node", "TextNode", "IfNode", "object at 0x"):
+                self.assertNotIn(leak, body, f"{leak} leaked into {url}")
+
+    def test_the_progress_line_reads_sensibly(self):
+        self.client.post(reverse("project4:consent"), {"consent": "on"})
+        self.assertRegex(
+            self.client.get(reverse("project4:task")).content.decode(),
+            "Block [0-9]+ &middot; question [0-9]+ of [0-9]+",
+        )
 
     def test_a_whole_session_runs_through_both_conditions(self):
         participant = self._walk()

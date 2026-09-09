@@ -13,7 +13,7 @@
         </div>
     </div>
 
-    <p class="progress">Block {{ block }} &middot; question {{ position }} of {{ total }}</p>
+    <p class="progress">Block {{ block_number }} &middot; question {{ position }} of {{ total }}</p>
 
     {% if is_first_of_block %}
         <p class="notice">
@@ -49,17 +49,13 @@
             <table class="ranking">
                 <thead><tr><th>Position</th><th>Film</th></tr></thead>
                 <tbody>
-                    {% for film in films %}
+                    {% for row in rows %}
                         <tr>
-                            <td class="rank-cell">
-                                {% for field in form %}
-                                    {% if field.name == "rank_"|add:film.index|stringformat:"s" %}{{ field }}{% endif %}
-                                {% endfor %}
-                            </td>
+                            <td class="rank-cell">{{ row.field }}</td>
                             <td>
-                                <span class="film-title">{{ film.title }}</span>
-                                <span class="film-meta">{{ film.year }} &middot; {{ film.duration }} min &middot; {{ film.rating }}</span>
-                                <span class="film-genres">{{ film.genres }}</span>
+                                <span class="film-title">{{ row.film.title }}</span>
+                                <span class="film-meta">{{ row.film.year }} &middot; {{ row.film.duration }} min &middot; {{ row.film.rating }}</span>
+                                <span class="film-genres">{{ row.film.genres }}</span>
                             </td>
                         </tr>
                     {% endfor %}

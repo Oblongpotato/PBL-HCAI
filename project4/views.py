@@ -100,14 +100,23 @@ def task(request):
     else:
         form = _bind(condition, films)
 
+    described = [data.describe(index) for index in films]
+    # Pair each film with its own rank field here rather than trying to match them up by name
+    # inside the template, where `"rank_"|add:index` silently yields an empty string.
+    rows = [
+        {"film": film, "field": form[f"rank_{film['index']}"]}
+        for film in described
+    ] if condition == RANKING else []
+
     return render(
         request,
         "project4/task.html",
         {
             "form": form,
             "condition": condition,
-            "films": [data.describe(index) for index in films],
-            "block": block,
+            "films": described,
+            "rows": rows,
+            "block_number": block,
             "position": position,
             "total": study.tasks_in_block(condition),
             "is_first_of_block": position == 1,
