@@ -34,11 +34,16 @@ def consent(request):
     if request.method == "POST":
         form = ConsentForm(request.POST)
         if form.is_valid():
-            # Alternate who sees which interface first: this is the counterbalancing.
-            first = PAIRWISE if Participant.objects.count() % 2 == 0 else RANKING
+            # Alternate who sees which interface first: this is the counterbalancing. The
+            # parity comes from the participant's own primary key, which the database
+            # allocates atomically, rather than from a count() that two simultaneous
+            # consents could both read before either row exists.
             participant = Participant.objects.create(
-                first_condition=first, consented_at=timezone.now()
+                first_condition=PAIRWISE, consented_at=timezone.now()
             )
+            if participant.pk % 2 == 0:
+                participant.first_condition = RANKING
+                participant.save(update_fields=["first_condition"])
             request.session[SESSION_KEY] = str(participant.token)
             return redirect("project4:task")
     else:
@@ -75,14 +80,19 @@ def task(request):
 
     block, position = step
     condition = study.condition_for(participant, block)
-    films = study.build_slates(participant)[(block, position)]
 
     record, _ = ElicitationTask.objects.get_or_create(
         participant=participant,
         block=block,
         position=position,
-        defaults={"condition": condition, "film_indices": films},
+        defaults={
+            "condition": condition,
+            "film_indices": study.build_slates(participant)[(block, position)],
+        },
     )
+    # Render what was recorded, not a second derivation of it. The two agree today because the
+    # generator is seeded on the token, but only one of them is what the participant saw.
+    films = record.film_indices
 
     if request.method == "POST":
         form = _bind(condition, films, request.POST)

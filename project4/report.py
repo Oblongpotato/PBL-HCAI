@@ -200,9 +200,12 @@ def _task3(doc):
     )
     doc.paragraph(
         "The cost of the within-subject choice is order effects, so the order is counterbalanced: "
-        "participants are assigned alternately, so half do pairwise first and half do ranking "
-        "first. The implementation does this by participant count, not at random, which guarantees "
-        "balance rather than merely expecting it."
+        "participants are assigned alternately at enrolment, so half start with pairwise and half "
+        "with ranking. Alternating rather than randomising removes the chance of an accidentally "
+        "lopsided split. It balances <i>starters</i>, though, not completers: someone who consents "
+        "and then abandons still consumes their position in the sequence, so dropout can leave the "
+        "analysed sample slightly uneven. The realised split should therefore be reported, and "
+        "re-balanced by recruiting a few extra participants if it drifts."
     )
     doc.paragraph(
         f"Each block holds {pairwise_tasks} pairwise tasks or {ranking_tasks} ranking tasks, which "
@@ -300,6 +303,12 @@ def _validity(doc):
         "that is quick, but ranking is cognitively harder per second than choosing. Two interfaces "
         "could score alike while demanding very different amounts of effort, which is exactly why "
         "the workload measure is reported next to it rather than as an afterthought.",
+        "<b>Idle time counts as time on task.</b> Duration is measured server-side from when a "
+        "slate is first presented to when it is submitted, so a participant who opens a question, "
+        "is interrupted, and returns has the interruption counted against the interface. Time is "
+        "the denominator of the primary measure, so this inflates it. Implausibly long responses "
+        "should be trimmed or winsorised before analysis, and a client-side timer that pauses on "
+        "blur would measure it properly.",
         "<b>Satisficing on the ranking task.</b> A participant who finds ten items too hard may "
         "order the top few and leave the rest arbitrary. That looks like information but is not. "
         "Unusually fast rankings should be flagged, and a follow-up could compare the model's fit "

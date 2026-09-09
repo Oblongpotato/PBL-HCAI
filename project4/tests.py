@@ -230,6 +230,16 @@ class InterfaceTests(TestCase):
                 reverse("project4:task"), {"choice": str(pending.film_indices[0])}
             )
 
+    def test_the_page_shows_exactly_the_slate_that_was_recorded(self):
+        # The view used to re-derive the slate rather than read the stored one, so the record
+        # and what the participant saw were two independent derivations of the same thing.
+        self.client.post(reverse("project4:consent"), {"consent": "on"})
+        participant = Participant.objects.order_by("id").last()
+        body = self.client.get(reverse("project4:task")).content.decode()
+        record = ElicitationTask.objects.filter(participant=participant).first()
+        for index in record.film_indices:
+            self.assertIn(data.describe(index)["title"], body)
+
     def test_no_template_internals_leak_into_the_page(self):
         # `block` is a Django tag name, so a context variable called `block` renders the
         # BlockNode's repr into the page. Status-code assertions never see this.
