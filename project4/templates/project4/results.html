@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'project4/style.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="box p4">
+    <div class="title-container"><div class="title">What your answers say</div></div>
+
+    <p class="lead">
+        Thank you. Your answers were fitted with the Plackett&ndash;Luce model described in the
+        report, giving one weight per feature. Those weights produce the recommendations below.
+    </p>
+
+    <section class="panel">
+        <h2>Films you might like</h2>
+        <p class="hint">Highest utility under your fitted weights, excluding anything you were shown.</p>
+        <div class="table-scroll">
+            <table class="compact">
+                <thead><tr><th>Film</th><th>Year</th><th>Genres</th><th>Score</th></tr></thead>
+                <tbody>
+                    {% for film in recommendations %}
+                        <tr>
+                            <td>{{ film.title }}</td><td>{{ film.year }}</td>
+                            <td>{{ film.genres }}</td><td>{{ film.score }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>What pulled hardest</h2>
+        <p class="hint">
+            The five features with the strongest positive and negative weights. Because every
+            feature was standardised, these are directly comparable with each other.
+        </p>
+        <div class="table-scroll">
+            <table class="compact">
+                <thead><tr><th>Feature</th><th>Weight</th></tr></thead>
+                <tbody>
+                    {% for row in strongest %}
+                        <tr class="{% if row.weight > 0 %}positive{% else %}negative{% endif %}">
+                            <td>{{ row.feature }}</td><td>{{ row.weight }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <p class="hint">
+            With only a few dozen comparisons behind them these are indicative rather than
+            reliable, which is exactly the limitation the study is designed to measure.
+        </p>
+    </section>
+
+    <section class="panel">
+        <h2>What each interface cost you</h2>
+        <div class="table-scroll">
+            <table class="compact">
+                <thead><tr><th>Interface</th><th>Comparisons given</th><th>Seconds spent</th></tr></thead>
+                <tbody>
+                    {% for row in per_condition %}
+                        <tr><td>{{ row.condition }}</td><td>{{ row.comparisons }}</td><td>{{ row.seconds }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <p class="hint">
+            In the real study these two numbers are the heart of the primary measure: how much was
+            learned, per minute of your time.
+        </p>
+    </section>
+
+    <p class="back"><a href="{% url 'project4:index' %}">&larr; Back to the project page</a></p>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'project4/style.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="box p4">
+    <div class="title-container">
+        <div class="title">Project 4 &mdash; Preference Elicitation</div>
+    </div>
+
+    <p class="lead">
+        A recommender that has never met you has to learn your taste from a handful of questions.
+        It could show you two films and ask which you prefer, or show you ten and ask you to put
+        them in order. Which is the better use of your attention is an empirical question, and this
+        is the study that would answer it.
+    </p>
+
+    <p class="notice">
+        The study is <strong>designed, not run</strong>. What follows is the protocol and a working
+        participant interface that could be used to carry it out.
+    </p>
+
+    <div class="doors">
+        <section class="panel door">
+            <h2>Read the design</h2>
+            <p class="hint">
+                The film representation, the extension of Bradley&ndash;Terry to rankings, and the
+                full experimental protocol: hypotheses, sample size, procedure, analysis, ethics
+                and threats to validity.
+            </p>
+            <p><a class="button" href="{% url 'project4:report' %}">Download the report (PDF)</a></p>
+        </section>
+
+        <section class="panel door">
+            <h2>Take part</h2>
+            <p class="hint">
+                Try the interface a participant would see. You will use both elicitation methods,
+                and at the end you get film recommendations inferred from your own answers.
+                About fifteen minutes.
+            </p>
+            <p><a class="button" href="{% url 'project4:consent' %}">Start the study</a></p>
+        </section>
+    </div>
+
+    <section class="panel">
+        <h2>The catalogue</h2>
+        <dl class="facts">
+            <dt>Films</dt>
+            <dd>
+                {{ summary.n_films }} of {{ summary.n_raw }} from the IMDB 5000 dataset
+                ({{ summary.n_dropped }} dropped for missing fields or duplicate titles),
+                {{ summary.year_range.0 }}&ndash;{{ summary.year_range.1 }}.
+            </dd>
+            <dt>Representation</dt>
+            <dd>{{ summary.n_features }} features, including {{ summary.n_genres }} genres.</dd>
+            <dt>Ratings</dt>
+            <dd>None. The dataset has no user ratings, so every preference comes from the interface.</dd>
+        </dl>
+    </section>
+
+    <p class="back"><a href="{% url 'home:index' %}">&larr; Back to the project hub</a></p>
+</div>
+{% endblock %}
