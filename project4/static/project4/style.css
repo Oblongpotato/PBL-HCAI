@@ -1,0 +1,99 @@
+/* The shared .box is absolutely centred, which only works for short pages.
+   These pages scroll, so they are laid out in normal flow instead. */
+.box.p4 {
+    position: static;
+    transform: none;
+    grid-template-rows: auto;
+    width: auto;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 10px 24px 24px;
+    box-sizing: border-box;
+}
+
+.p4 button { width: auto; padding: 0 22px; font-size: 16px; height: 40px; margin: 0; }
+
+.p4 .lead { color: #444; line-height: 1.5; }
+
+.p4 .panel {
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 18px 0;
+    background: #fff;
+}
+.p4 .panel h2 { margin-top: 0; font-size: 1.15rem; }
+.p4 .hint { color: #666; font-size: 0.85rem; }
+
+.p4 .notice {
+    border-left: 4px solid #275CB2;
+    background: #f6f8fc;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+}
+.p4 .error {
+    border-left: 4px solid #b23b3b;
+    background: #fdf1f1;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+}
+.p4 .progress { color: #888; font-size: 0.85rem; }
+
+.p4 .doors { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+.p4 .door { display: flex; flex-direction: column; }
+.p4 .door p:last-child { margin-top: auto; }
+
+.p4 a.button {
+    display: inline-block;
+    background: #275CB2;
+    color: #fff;
+    padding: 11px 22px;
+    border-radius: 3px;
+    text-decoration: none;
+    font-size: 1rem;
+}
+.p4 a.button:hover { opacity: 0.9; }
+
+.p4 .facts { display: grid; grid-template-columns: max-content 1fr; gap: 6px 18px; margin: 0; }
+.p4 .facts dt { font-weight: 600; color: #555; }
+.p4 .facts dd { margin: 0; }
+
+/* Pairwise: two large targets, so the choice is one unambiguous click. */
+.p4 .pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 18px 0; }
+.p4 .film-choice {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 22px;
+    background: #fff;
+    border: 2px solid #275CB2;
+    border-radius: 6px;
+    color: #222;
+    cursor: pointer;
+    text-align: left;
+    font-size: 1rem;
+}
+.p4 .film-choice:hover { background: #eef3ff; }
+.p4 .film-title { font-size: 1.15rem; font-weight: 600; }
+.p4 .film-meta, .p4 .film-genres, .p4 .film-director { font-size: 0.85rem; color: #666; }
+
+.p4 table.ranking { border-collapse: collapse; width: 100%; margin: 16px 0; }
+.p4 table.ranking th, .p4 table.ranking td {
+    border: 1px solid #e2e2e2; padding: 8px 12px; text-align: left; vertical-align: middle;
+}
+.p4 table.ranking thead th { background: #f4f4f4; }
+.p4 .rank-cell { width: 90px; }
+.p4 .rank-cell select { font-size: 1rem; padding: 5px; }
+.p4 table.ranking .film-title { display: block; }
+.p4 table.ranking .film-meta, .p4 table.ranking .film-genres { display: block; }
+
+.p4 .table-scroll { overflow-x: auto; }
+.p4 table.compact { border-collapse: collapse; font-size: 0.88rem; width: 100%; }
+.p4 table.compact th, .p4 table.compact td { border: 1px solid #e2e2e2; padding: 5px 12px; text-align: left; }
+.p4 table.compact thead th { background: #f4f4f4; }
+.p4 tr.positive { background: #f2f8f2; }
+.p4 tr.negative { background: #fbf3f3; }
+
+.p4 .back { margin-top: 24px; font-size: 0.9rem; }

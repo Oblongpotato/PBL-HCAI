@@ -45,6 +45,13 @@ def _styles():
                                   fontSize=9, alignment=TA_CENTER, spaceBefore=6, spaceAfter=8),
         "caption": ParagraphStyle("caption", parent=base["BodyText"], fontSize=8.5,
                                   textColor=colors.grey, alignment=TA_CENTER, spaceAfter=10),
+        # Table cells are paragraphs, not plain strings: reportlab draws a bare string on one
+        # line and lets it run straight past the cell border rather than wrapping it.
+        "cell": ParagraphStyle("cell", parent=base["BodyText"], fontSize=8.5, leading=10.5,
+                               spaceBefore=0, spaceAfter=0),
+        "cell_header": ParagraphStyle("cell_header", parent=base["BodyText"], fontSize=8.5,
+                                      leading=10.5, fontName="Helvetica-Bold",
+                                      spaceBefore=0, spaceAfter=0),
     }
 
 
@@ -75,22 +82,29 @@ class Report:
         self.flow.append(Paragraph(text, self.styles["formula"]))
         return self
 
+    def _cell(self, value, style):
+        """Wrap a cell so its text wraps inside the column instead of overrunning it."""
+        if hasattr(value, "wrap"):
+            return value
+        return Paragraph(str(value), self.styles[style])
+
     def table(self, rows, header=True, widths=None):
-        """`rows` is a list of lists; everything is stringified."""
-        data = [[str(cell) for cell in row] for row in rows]
+        """`rows` is a list of lists. Cells wrap; pass a flowable to keep your own formatting."""
+        data = [
+            [self._cell(cell, "cell_header" if header and index == 0 else "cell") for cell in row]
+            for index, row in enumerate(rows)
+        ]
         table = Table(data, colWidths=widths, hAlign="LEFT")
         style = [
             ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#cccccc")),
-            ("FONTSIZE", (0, 0), (-1, -1), 8.5),
-            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("VALIGN", (0, 0), (-1, -1), "TOP"),
             ("LEFTPADDING", (0, 0), (-1, -1), 5),
             ("RIGHTPADDING", (0, 0), (-1, -1), 5),
+            ("TOPPADDING", (0, 0), (-1, -1), 4),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
         ]
         if header:
-            style += [
-                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#eeeeee")),
-                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-            ]
+            style.append(("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#eeeeee")))
         table.setStyle(TableStyle(style))
         self.flow.extend([table, Spacer(1, 10)])
         return self
