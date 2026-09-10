@@ -15,11 +15,18 @@ from sklearn.model_selection import cross_val_predict
 from . import data
 
 
+
+def _estimator():
+    """The baseline model. Defined once: the deferral features describe this classifier's
+    confidences, so the out-of-fold fit has to be the same model as the deployed one."""
+    return LogisticRegression(max_iter=2000, C=4.0)
+
+
 @lru_cache(maxsize=1)
 def baseline():
     """Fit on the full training set and report how it does per topic."""
     parts = data.features()
-    model = LogisticRegression(max_iter=2000, C=4.0)
+    model = _estimator()
     model.fit(parts["X_train"], parts["y_train"])
 
     probabilities = {
@@ -63,7 +70,6 @@ def report():
         "per_topic": {topic: round(value, 4) for topic, value in result["per_topic"].items()},
         "confusion": result["confusion"],
         "topics": data.TOPICS,
-        "mean_confidence": round(float(np.mean(confidence("test"))), 4),
     }
 
 
@@ -78,7 +84,7 @@ def out_of_fold_probabilities():
     """
     parts = data.features()
     return cross_val_predict(
-        LogisticRegression(max_iter=2000, C=4.0),
+        _estimator(),
         parts["X_train"],
         parts["y_train"],
         cv=3,

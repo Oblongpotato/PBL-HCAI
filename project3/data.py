@@ -76,7 +76,3 @@ def summary():
         "example": train.iloc[0]["text"][:220],
         "example_topic": train.iloc[0]["topic"],
     }
-
-
-def topic_names(codes):
-    return np.asarray(TOPICS, dtype=object)[np.asarray(codes)]

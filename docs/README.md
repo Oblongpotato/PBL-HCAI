@@ -221,9 +221,14 @@ actually better, while confidence-based rejection spreads the same budget almost
 `project3/active.py` starts with no expert labels at all. The query utility targets the
 decision the labels feed, preferring articles where the expert and the classifier are equally
 likely to be right, multiplied by a representativeness term so the budget is not spent on
-outliers. It reaches a given system accuracy with roughly a fifth of the labels random
-querying needs, and beats querying by classifier uncertainty, which finds hard articles but
-says nothing about whether the expert can handle them.
+outliers. Both terms are ranked before multiplying: the informativeness spans nearly its whole
+range across the pool while the density spans a narrow band, so multiplying the raw values
+would hand the decision to the density alone.
+
+Measured by the area under the learning curve it holds 0.892 system accuracy against 0.881 for
+querying by classifier uncertainty and 0.863 for querying at random. The three converge at the
+end of the budget, when most of the pool has been labelled, so the early part of the curve is
+the part that means anything.
 
 ### The report
 

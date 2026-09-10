@@ -8,13 +8,24 @@ from pathlib import Path
 
 from utils.report import Report
 
-from . import data, defer, experiments
+from . import experiments
 
 STATIC = Path(__file__).resolve().parent / "static"
 
 
 def _figure(path):
     return STATIC / path
+
+
+def _curve_mean(curve):
+    """Mean accuracy over the budget: the area under the learning curve, normalised.
+
+    The right summary for a query strategy, because it rewards getting there sooner. Accuracy
+    at the end of the budget does not: by then every strategy has labelled most of the pool.
+    A single "labels needed to reach X" figure is no good either, since random querying is
+    noisy enough to touch a level early and fall back below it.
+    """
+    return round(sum(point["system_accuracy"] for point in curve) / len(curve), 4)
 
 
 def _percent(value):
@@ -170,9 +181,9 @@ def _task3(doc, results):
     doc.bullets([
         "<b>The class answer comes from the task 1 classifier, not from the learned scorers.</b> "
         "Letting the K+1 model produce the class prediction as well was tried first and produced a "
-        "markedly weaker classifier than the one already built (0.90 against 0.97 on the same kept "
-        "set), which made deferral look better than it was by comparing it against a straw man. The "
-        "deferral model now decides only <i>whether</i> to answer.",
+        "markedly weaker classifier than the one already built, which made deferral look better "
+        "than it was by comparing it against a straw man. The deferral model now decides only "
+        "<i>whether</i> to answer.",
         "<b>kappa is chosen on held-out training data, never on the test set.</b> The query cost "
         "matters and the surrogate is loose enough that the value changes the outcome, so selecting "
         "it on the test set would report a score the search had already seen.",
@@ -188,17 +199,26 @@ def _task3(doc, results):
     )
 
     doc.heading("Results", level=2)
-    rows = [["", "System accuracy", "Deferred", "Expert accuracy when asked", "Right party chosen"]]
+    doc.paragraph(
+        "Routing accuracy scores the hand-over decision rather than the answer. Both parties agree "
+        f"on most articles, so the decision only changes the outcome on the "
+        f"{_percent(specialist['css']['decisive_share'])} of the test set where exactly one of them "
+        "was right; that is the subset it is measured on. Counting the rest would only reproduce "
+        "system accuracy in a second column."
+    )
+    rows = [["", "System accuracy", "Deferred", "Expert accuracy when asked", "Routing accuracy"]]
     rows.append(["Classifier alone", specialist["baseline_accuracy"], "0.0", "—", "—"])
     rows.append(["Learned deferral", specialist["css"]["system_accuracy"],
                  specialist["css"]["deferral_rate"],
                  specialist["css"]["expert_accuracy_on_deferred"],
-                 specialist["css"]["right_party_chosen"]])
-    rows.append(["Confidence-based, same budget",
-                 specialist["confidence_matched"]["system_accuracy"],
-                 specialist["confidence_matched"]["deferral_rate"],
-                 specialist["confidence_matched"]["expert_accuracy_on_deferred"],
-                 specialist["confidence_matched"]["right_party_chosen"]])
+                 specialist["css"]["routing_accuracy"]])
+    matched = specialist["confidence_matched"]
+    if matched:
+        rows.append(["Confidence-based, same budget",
+                     matched["system_accuracy"],
+                     matched["deferral_rate"],
+                     matched["expert_accuracy_on_deferred"],
+                     matched["routing_accuracy"]])
     rows.append(["Perfect routing", specialist["css"]["oracle_ceiling"], "—", "—", "1.0"])
     doc.table(rows)
 
@@ -255,13 +275,25 @@ def _task4(doc, results):
     )
 
     curves = {s["strategy"]: s["curve"] for s in specialist["strategies"]}
-    proposed, random_query = curves["proposed"], curves["random"]
+    # The comparison is label efficiency, so summarise each curve by its area rather than by
+    # its last point, where every strategy has seen most of the pool and they converge.
+    area = {name: _curve_mean(curve) for name, curve in curves.items()}
     doc.paragraph(
-        f"The result is a large gain in label efficiency. The proposed strategy reaches "
-        f"{proposed[3]['system_accuracy']} system accuracy after {proposed[3]['queries']} expert "
-        f"labels; random querying is still at {random_query[-1]['system_accuracy']} after "
-        f"{random_query[-1]['queries']}, five times as many. Knowing every expert label would give "
-        f"{specialist['full_supervision']}."
+        f"The result is a gain in label efficiency. Averaged across the budget the proposed "
+        f"strategy holds {area['proposed']} system accuracy, against "
+        f"{area['classifier_uncertainty']} for querying by classifier uncertainty and "
+        f"{area['random']} for querying at random. It is ahead from about two hundred labels "
+        f"onward, which is the whole point: the strategy is judged on how few answers it needs, "
+        f"not on where it lands once most of the pool has been labelled. Knowing every expert "
+        f"label would give {specialist['full_supervision']}."
+    )
+    doc.paragraph(
+        "The gap closes at the end of the budget: after a thousand labels the proposed strategy "
+        f"is at {curves['proposed'][-1]['system_accuracy']} and classifier uncertainty at "
+        f"{curves['classifier_uncertainty'][-1]['system_accuracy']}, a difference of no "
+        "consequence. That is expected rather than disappointing. With enough of the pool "
+        "labelled every strategy has seen the regions that matter, and the question active "
+        "learning asks is how quickly you get there, not where you end up."
     )
     doc.figure(_figure(specialist["figure"]),
                "Asking about the right articles matters more than asking about many.")

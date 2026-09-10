@@ -1,7 +1,7 @@
 from io import BytesIO
 
 from django.http import FileResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
 from . import experiments, report
 
@@ -28,8 +28,15 @@ def index(request):
 
 def report_pdf(request):
     """The report the brief asks for, built from the committed results on each request."""
+    try:
+        body = report.build()
+    except FileNotFoundError:
+        # Nothing to report on yet. The index says what to run, so send the reader there
+        # rather than to a stack trace.
+        return redirect("project3:index")
+
     return FileResponse(
-        BytesIO(report.build()),
+        BytesIO(body),
         as_attachment=True,
         filename="project3-report.pdf",
         content_type="application/pdf",
