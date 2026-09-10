@@ -234,6 +234,17 @@ td.is-empty {
     text-align: left;
 }
 
+/* For a figure that must not be shrunk to fit, such as a decision tree whose node text
+   has to stay readable. */
+.plot__scroll {
+    max-height: 70vh;
+    overflow: auto;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+}
+
+.plot__scroll img { max-width: none; border: none; border-radius: 0; }
+
 .figures {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));

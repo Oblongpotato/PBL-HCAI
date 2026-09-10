@@ -6,22 +6,26 @@
 {% endblock %}
 
 {% block content %}
-<div class="box p2">
-    <div class="title-container">
-        <div class="title">Project 2 &mdash; Explainability</div>
-    </div>
+<p class="lead">
+    Which penguin species is it, and <em>why</em>? Pick how complex a model you are willing to
+    accept, then read the model itself.
+</p>
 
-    <p class="lead">
-        Which penguin species is it, and <em>why</em>? Pick how complex a model you are willing to
-        accept, then read the model itself.
-    </p>
+{% include "project2/_dataset.html" %}
+{% include "project2/_selection.html" %}
+{% include "project2/_model.html" %}
+{% include "project2/_counterfactuals.html" %}
+{% include "project2/_effects.html" %}
 
-    {% include "project2/_dataset.html" %}
-    {% include "project2/_selection.html" %}
-    {% include "project2/_model.html" %}
-    {% include "project2/_counterfactuals.html" %}
-    {% include "project2/_effects.html" %}
-
-    <p class="back"><a href="{% url 'home:index' %}">&larr; Back to the project hub</a></p>
-</div>
+<p class="back"><a href="{% url 'home:index' %}">&larr; Back to the project hub</a></p>
 {% endblock %}
+
+{% block script %}
+<script>
+    // A tree is drawn centred on its root, so open the scroller in the middle rather
+    // than on the empty left edge.
+    document.querySelectorAll(".plot__scroll").forEach(function (box) {
+        box.scrollLeft = (box.scrollWidth - box.clientWidth) / 2;
+    });
+</script>
+{% endblock script %}

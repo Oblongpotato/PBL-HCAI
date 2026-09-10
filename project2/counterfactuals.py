@@ -34,6 +34,16 @@ def mad():
 
 
 @lru_cache(maxsize=1)
+def _bounds():
+    """The range each numeric feature actually takes in the dataset."""
+    frame = data.load()
+    return {
+        feature: (float(frame[feature].min()), float(frame[feature].max()))
+        for feature in data.NUMERIC_FEATURES
+    }
+
+
+@lru_cache(maxsize=1)
 def _categories():
     frame = data.load()
     return {feature: sorted(frame[feature].unique()) for feature in data.CATEGORICAL_FEATURES}
@@ -54,12 +64,16 @@ def sample_around(x, size, sigma, rng):
     """Noise numeric features on their own scale; resample categories occasionally.
 
     Categorical and binary features cannot be nudged, so they are redrawn from the values
-    the dataset actually contains, and only for a minority of the samples.
+    the dataset actually contains, and only for a minority of the samples. Numeric features
+    stay inside the range the dataset covers.
     """
-    deviations = mad()
+    deviations, bounds = mad(), _bounds()
     columns = {}
     for feature in data.NUMERIC_FEATURES:
-        columns[feature] = x[feature] + rng.normal(0, sigma * deviations[feature], size)
+        drawn = x[feature] + rng.normal(0, sigma * deviations[feature], size)
+        # Unbounded noise proposes penguins that cannot exist, such as a negative body
+        # mass. Clipping to the observed range keeps every suggestion a realistic bird.
+        columns[feature] = np.clip(drawn, *bounds[feature])
 
     for feature, options in _categories().items():
         drawn = rng.choice(options, size=size)
