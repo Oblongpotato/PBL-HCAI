@@ -69,3 +69,16 @@ def example(row):
     frame = load()
     index = max(0, min(int(row), len(frame) - 1))
     return index, frame.iloc[index]
+
+
+@lru_cache(maxsize=1)
+def row_choices():
+    """Every penguin, described well enough to pick one out of a list."""
+    return [
+        (
+            index,
+            f"{index} — {row.species}, {row.island}, "
+            f"bill {row.bill_length_mm:.0f} mm, {row.body_mass_g:.0f} g",
+        )
+        for index, row in enumerate(load().itertuples(index=False))
+    ]

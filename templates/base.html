@@ -1,21 +1,24 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <link rel= "stylesheet" href="{% static 'style.css' %}">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{% if page_title %}{{ page_title }} &middot; HCAI{% else %}HCAI projects{% endif %}</title>
+        <link rel="stylesheet" href="{% static 'style.css' %}">
         {% block extra_css %}{% endblock %}
-        <link rel="shortcut icon" href="{% static 'favicon/favicon.ico' %}">
-        <title>HCAI project</title>
-        <style></style>
     </head>
     <body>
-        <div class="grid-parent">
-            {% block content %}
-            {%  endblock %}
-        </div>
+        <header class="app-bar">
+            <a class="app-bar__brand" href="{% url 'home:index' %}">HCAI Projects</a>
+            {% if page_title %}<span class="app-bar__page">{{ page_title }}</span>{% endif %}
+        </header>
 
-        {% block script %}
-        {% endblock script %}
+        <main class="page">
+            {% if page_title %}<h1 class="page-title">{{ page_title }}</h1>{% endif %}
+            {% block content %}{% endblock %}
+        </main>
+
+        {% block script %}{% endblock script %}
     </body>
 </html>

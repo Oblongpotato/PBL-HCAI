@@ -6,6 +6,9 @@ from django.db import models
 
 from utils import datasets
 
+from . import ml
+
+
 def private_storage():
     """Uploads live outside MEDIA_ROOT, which pbl/urls.py serves publicly.
 
@@ -70,3 +73,12 @@ class TrainingRun(models.Model):
 
     def __str__(self):
         return f"{self.model_key} @ {self.hyperparameter}={self.best_value}"
+
+    @property
+    def model_label(self):
+        """The name the interface used when this run was configured, not the stored key."""
+        return ml.MODELS.get(self.model_key, {}).get("label", self.model_key)
+
+    @property
+    def score_label(self):
+        return ml.SCORES.get(self.scoring, {}).get("label", self.scoring)

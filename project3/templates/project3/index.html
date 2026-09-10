@@ -6,53 +6,45 @@
 {% endblock %}
 
 {% block content %}
-<div class="box p3">
-    <div class="title-container">
-        <div class="title">Project 3 &mdash; Learning to Defer</div>
-    </div>
+<p class="lead">
+    A topic classifier for news articles that can hand an article to a human expert instead of
+    answering. The question is when handing over is worth it, and how to find that out when
+    nobody has told you what the expert is good at.
+</p>
 
-    <p class="lead">
-        A topic classifier for news articles that can hand an article to a human expert instead of
-        answering. The question is when handing over is worth it, and how to find that out when
-        nobody has told you what the expert is good at.
-    </p>
-
-    {% if not results %}
-        <section class="panel">
-            <h2>Results not generated</h2>
-            <p>Run <code>python manage.py run_project3</code> to produce them.</p>
-        </section>
-    {% else %}
-        {% if stale %}
-            <p class="stale">
-                These results were produced by a different version of the code than is checked out.
-                Re-run <code>manage.py run_project3</code> to bring them back in step.
-            </p>
-        {% endif %}
-
-        {% include "project3/_data.html" %}
-        {% include "project3/_baseline.html" %}
-        {% include "project3/_expert.html" %}
-        {% include "project3/_defer.html" %}
-        {% include "project3/_active.html" %}
-
-        <section class="panel">
-            <h2>6. The report</h2>
-            <p class="hint">
-                The full write-up: what was built, why each design choice was made, and what the
-                numbers above mean, including the case where deferring turns out not to pay.
-            </p>
-            <p>
-                <a class="download" href="{% url 'project3:report' %}">Download the report (PDF)</a>
-            </p>
-        </section>
-
-        <p class="provenance">
-            Results generated {{ results.generated.utc }} from commit
-            <code>{{ results.generated.git_sha }}</code>.
+{% if not results %}
+    <section class="panel">
+        <h2>Results not generated</h2>
+        <p>Run <code>python manage.py run_project3</code> to produce them.</p>
+    </section>
+{% else %}
+    {% if stale %}
+        <p class="callout callout--warn">
+            These results were produced by a different version of the code than is checked out.
+            Re-run <code>manage.py run_project3</code> to bring them back in step.
         </p>
     {% endif %}
 
-    <p class="back"><a href="{% url 'home:index' %}">&larr; Back to the project hub</a></p>
-</div>
+    {% include "project3/_data.html" %}
+    {% include "project3/_baseline.html" %}
+    {% include "project3/_expert.html" %}
+    {% include "project3/_defer.html" %}
+    {% include "project3/_active.html" %}
+
+    <section class="panel">
+        <h2>6. The report</h2>
+        <p class="hint">
+            The full write-up: what was built, why each design choice was made, and what the
+            numbers above mean, including the case where deferring turns out not to pay.
+        </p>
+        <p><a class="btn" href="{% url 'project3:report' %}">Download the report (PDF)</a></p>
+    </section>
+
+    <p class="provenance">
+        Results generated {{ results.generated.utc }} from commit
+        <code>{{ results.generated.git_sha }}</code>.
+    </p>
+{% endif %}
+
+<p class="back"><a href="{% url 'home:index' %}">&larr; Back to the project hub</a></p>
 {% endblock %}

@@ -15,7 +15,7 @@
     {% if history %}
         <h3>Run history</h3>
         <div class="table-scroll">
-            <table class="history">
+            <table class="data">
                 <thead>
                     <tr>
                         <th>When</th><th>Decided by</th><th>Model</th><th>Best</th>
@@ -24,13 +24,16 @@
                 </thead>
                 <tbody>
                     {% for run in history %}
-                        <tr class="{% if run.automated %}auto-row{% endif %}">
-                            <td>{{ run.created_at|date:"H:i:s" }}</td>
-                            <td>{% if run.automated %}the app{% else %}you{% endif %}</td>
-                            <td>{{ run.model_key }}</td>
+                        <tr>
+                            <td>{{ run.created_at|date:"j M, H:i" }}</td>
+                            <td>
+                                {% if run.automated %}<span class="tag tag--auto">the app</span>
+                                {% else %}<span class="tag">you</span>{% endif %}
+                            </td>
+                            <td>{{ run.model_label }}</td>
                             <td>{{ run.hyperparameter }} = {{ run.best_value|floatformat:"-3" }}</td>
                             <td>{{ run.selection_score|floatformat:4 }}</td>
-                            <td>{{ run.scoring }} {{ run.best_score|floatformat:4 }}</td>
+                            <td>{{ run.score_label }} {{ run.best_score|floatformat:4 }}</td>
                             <td>{{ run.test_size }}</td>
                             <td>{{ run.random_state }}</td>
                         </tr>

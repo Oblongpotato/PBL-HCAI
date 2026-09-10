@@ -12,20 +12,30 @@
         {% endif %}
     </dl>
 
-    <figure class="plot">
-        <img src="{{ model_plot }}" alt="The selected model">
-        <figcaption>
-            {% if family == "tree" %}
+    {% if family == "tree" %}
+        <figure class="plot">
+            <div class="plot__scroll"><img src="{{ model_plot }}" alt="The selected decision tree"></div>
+            <figcaption>
                 The model is the explanation: every prediction is the path from the root to a leaf,
-                and the thresholds are in the original units.
-            {% elif selected.complexity == 0 %}
-                &lambda; is high enough that the penalty outweighs any gain in accuracy, so every
-                coefficient has been driven to zero. The model now predicts the same species for
-                every penguin, which is what demanding maximum simplicity actually costs.
-            {% else %}
+                and the thresholds are in the original units. The tree is shown at full size, so
+                scroll it, or
+                <a href="{{ model_plot }}" target="_blank" rel="noopener">open the image on its own</a>.
+            </figcaption>
+        </figure>
+    {% elif model_plot %}
+        <figure class="plot">
+            <img src="{{ model_plot }}" alt="Weights of the selected model">
+            <figcaption>
                 One weight per feature and class. An L1 penalty drives the unused features to
                 exactly zero, which is what &Omega;(f) counts; those features are omitted here.
-            {% endif %}
-        </figcaption>
-    </figure>
+            </figcaption>
+        </figure>
+    {% else %}
+        <p class="callout">
+            &lambda; is high enough that the penalty outweighs any gain in accuracy, so every
+            coefficient has been driven to zero. There is no weight left to plot: the model now
+            predicts the same species for every penguin, which is what demanding maximum
+            simplicity actually costs.
+        </p>
+    {% endif %}
 </section>

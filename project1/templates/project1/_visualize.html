@@ -1,9 +1,13 @@
 <section class="panel">
     <h2>3. Visualise</h2>
-    <form method="post" action="{% url 'project1:visualize' %}" class="inline-form">
+
+    <form method="post" action="{% url 'project1:visualize' %}">
         {% csrf_token %}
-        {{ visualization_form.as_p }}
-        <button type="submit">Draw</button>
+        {{ visualization_form.non_field_errors }}
+        <div class="form-grid">
+            {% for field in visualization_form %}{% include "field.html" %}{% endfor %}
+            <div class="field field--actions"><button type="submit">Draw</button></div>
+        </div>
     </form>
 
     {% if plot %}

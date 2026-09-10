@@ -1,0 +1,7 @@
+{% comment %}One form field: label, widget, help text and errors each in their own slot.{% endcomment %}
+<div class="field {{ field_class }}">
+    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {{ field }}
+    {% if field.help_text %}<span class="field__help">{{ field.help_text }}</span>{% endif %}
+    {{ field.errors }}
+</div>

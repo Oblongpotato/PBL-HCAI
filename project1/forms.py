@@ -1,10 +1,18 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 
 from . import ml, plots
 from .models import TASK_CHOICES
 
 TREE_BUDGET = 500
+MAX_UPLOAD_MB = 10
+
+
+def within_size_limit(upload):
+    """Reject a file large enough to exhaust memory once pandas expands it."""
+    if upload.size > MAX_UPLOAD_MB * 1024 * 1024:
+        raise ValidationError(f"Keep the file under {MAX_UPLOAD_MB} MB.")
 
 
 class DatasetUploadForm(forms.Form):
@@ -12,7 +20,7 @@ class DatasetUploadForm(forms.Form):
 
     file = forms.FileField(
         label="CSV file",
-        validators=[FileExtensionValidator(allowed_extensions=["csv"])],
+        validators=[FileExtensionValidator(allowed_extensions=["csv"]), within_size_limit],
     )
     task = forms.ChoiceField(
         label="Problem type",
@@ -34,6 +42,9 @@ class VisualizationForm(forms.Form):
         choices = [(feature, feature) for feature in features]
         self.fields["x"].choices = choices
         self.fields["y"].choices = choices
+        # Defaulting both to the first feature would plot a column against itself.
+        if len(features) > 1:
+            self.fields["y"].initial = features[1]
 
     def clean(self):
         cleaned = super().clean()

@@ -10,6 +10,7 @@ from .forms import ConsentForm, PairwiseForm, RankingForm
 from .models import PAIRWISE, RANKING, ElicitationTask, Participant, Response
 
 SESSION_KEY = "project4_participant"
+PAGE_TITLE = "Project 4 — Preference Elicitation"
 
 
 def index(request):
@@ -17,7 +18,11 @@ def index(request):
 
     The brief asks for exactly these two doors, so they are the page.
     """
-    return render(request, "project4/index.html", {"summary": data.summary()})
+    return render(
+        request,
+        "project4/index.html",
+        {"page_title": PAGE_TITLE, "summary": data.summary()},
+    )
 
 
 def report_pdf(request):
@@ -48,7 +53,11 @@ def consent(request):
             return redirect("project4:task")
     else:
         form = ConsentForm()
-    return render(request, "project4/consent.html", {"form": form})
+    return render(
+        request,
+        "project4/consent.html",
+        {"page_title": "Before you start", "form": form},
+    )
 
 
 def _current(request):
@@ -122,6 +131,9 @@ def task(request):
         request,
         "project4/task.html",
         {
+            "page_title": (
+                "Which would you rather watch?" if condition == PAIRWISE else "Put these in order"
+            ),
             "form": form,
             "condition": condition,
             "films": described,
@@ -174,6 +186,7 @@ def results(request):
         request,
         "project4/results.html",
         {
+            "page_title": "What your answers say",
             "recommendations": [
                 data.describe(i) for i in preferences.recommend(weights, X, k=8, exclude=seen)
             ],

@@ -18,7 +18,7 @@
             </p>
 
             <div class="table-scroll">
-                <table class="compact">
+                <table class="data">
                     <thead>
                         <tr>
                             <th></th><th>system accuracy</th><th>deferred</th>
@@ -30,7 +30,7 @@
                             <th>classifier alone</th>
                             <td>{{ run.baseline_accuracy }}</td><td>0.0</td><td>&mdash;</td><td>&mdash;</td>
                         </tr>
-                        <tr class="highlight">
+                        <tr class="is-highlight">
                             <th>learned deferral</th>
                             <td>{{ run.css.system_accuracy }}</td>
                             <td>{{ run.css.deferral_rate }}</td>

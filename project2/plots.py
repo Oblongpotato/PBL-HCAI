@@ -9,10 +9,14 @@ from . import data, training
 
 
 def decision_tree(pipeline):
-    """The model itself, which for a tree is the explanation."""
+    """The model itself, which for a tree is the explanation.
+
+    The figure is sized from the leaf count and shown at its natural size in a scrolling
+    box, because a tree shrunk to the width of the page cannot be read.
+    """
     model = pipeline.named_steps["model"]
-    width = max(8, min(20, model.get_n_leaves() * 1.6))
-    fig, ax = plt.subplots(figsize=(width, width * 0.5))
+    width = max(9, min(22, model.get_n_leaves() * 1.7))
+    fig, ax = plt.subplots(figsize=(width, width * 0.48))
     plot_tree(
         model,
         feature_names=training.source_features(pipeline),
@@ -20,7 +24,7 @@ def decision_tree(pipeline):
         filled=True,
         rounded=True,
         impurity=False,
-        fontsize=9,
+        fontsize=10,
         ax=ax,
     )
     return save_figure(fig, "p2-tree")
@@ -44,7 +48,7 @@ def coefficients(pipeline):
     ax.axvline(0, color="black", linewidth=0.8)
     ax.set_xlabel("weight (on standardised features)")
     ax.set_title("Weights of the selected model")
-    ax.legend(fontsize=8)
+    ax.legend(fontsize=8, loc="upper left", bbox_to_anchor=(1.01, 1), borderaxespad=0)
     return save_figure(fig, "p2-coefficients")
 
 

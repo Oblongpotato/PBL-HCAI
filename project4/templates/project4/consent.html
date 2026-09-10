@@ -6,47 +6,47 @@
 {% endblock %}
 
 {% block content %}
-<div class="box p4">
-    <div class="title-container"><div class="title">Before you start</div></div>
+<section class="panel">
+    <h2>What this is</h2>
+    <p>
+        You will be asked about films twice, in two different ways. First you will choose
+        between pairs; later you will put a list of ten in order, or the other way round. It
+        takes about fifteen minutes. At the end you will see recommendations worked out from
+        your answers.
+    </p>
 
-    <section class="panel">
-        <h2>What this is</h2>
-        <p>
-            You will be asked about films twice, in two different ways. First you will choose
-            between pairs; later you will put a list of ten in order, or the other way round. It
-            takes about fifteen minutes. At the end you will see recommendations worked out from
-            your answers.
-        </p>
+    <h2>What is recorded</h2>
+    <ul>
+        <li>The orderings you give, and how long each one took.</li>
+        <li>A random identifier for your session.</li>
+    </ul>
+    <p>
+        <strong>No name, no email address, no IP address.</strong> There is nowhere in the
+        database for a personal detail to go. Nothing recorded could be traced back to you.
+    </p>
 
-        <h2>What is recorded</h2>
-        <ul>
-            <li>The orderings you give, and how long each one took.</li>
-            <li>A random identifier for your session.</li>
-        </ul>
-        <p>
-            <strong>No name, no email address, no IP address.</strong> There is nowhere in the
-            database for a personal detail to go. Nothing recorded could be traced back to you.
-        </p>
+    <h2>Your choices</h2>
+    <p>
+        Taking part is voluntary and you can stop at any point by closing the page, without
+        giving a reason. Because the session is anonymous, data already submitted cannot be
+        picked out and removed afterwards, which is why this is said before you begin rather
+        than after.
+    </p>
+    <p class="callout">
+        This is a course exercise demonstrating a study design. It is not collecting research
+        data and the results are not being analysed or published.
+    </p>
 
-        <h2>Your choices</h2>
-        <p>
-            Taking part is voluntary and you can stop at any point by closing the page, without
-            giving a reason. Because the session is anonymous, data already submitted cannot be
-            picked out and removed afterwards, which is why this is said before you begin rather
-            than after.
-        </p>
-        <p class="notice">
-            This is a course exercise demonstrating a study design. It is not collecting research
-            data and the results are not being analysed or published.
-        </p>
+    <form method="post" class="consent-form">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <label class="consent-check">
+            {{ form.consent }} {{ form.consent.label }}
+        </label>
+        {{ form.consent.errors }}
+        <button type="submit">Agree and start</button>
+    </form>
+</section>
 
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Agree and start</button>
-        </form>
-    </section>
-
-    <p class="back"><a href="{% url 'project4:index' %}">&larr; Back</a></p>
-</div>
+<p class="back"><a href="{% url 'project4:index' %}">&larr; Back</a></p>
 {% endblock %}

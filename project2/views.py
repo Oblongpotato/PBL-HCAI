@@ -1,6 +1,11 @@
+import math
+from functools import lru_cache
+
 from django.shortcuts import render
 
 from . import counterfactuals, data, effects, plots, training
+
+PAGE_TITLE = "Project 2 — Explainability"
 
 
 def _selection(request):
@@ -13,12 +18,41 @@ def _selection(request):
         lam = float(request.GET.get("lam", 0.0))
     except (TypeError, ValueError):
         lam = 0.0
+    # nan survives both comparisons below, so it has to be caught before them.
+    if not math.isfinite(lam):
+        lam = 0.0
     lam = min(max(lam, 0.0), training.lambda_max(family))
 
     return family, round(lam, 4)
 
 
-def _counterfactual_context(request, pipeline):
+def _pipeline(family, value):
+    return next(entry for entry in training.pool(family) if entry["value"] == value)["pipeline"]
+
+
+@lru_cache(maxsize=64)
+def _counterfactuals_for(family, value, row, target):
+    """Counterfactual rows for one fully specified state.
+
+    The search is the slowest thing on the page and the same state is re-requested every
+    time the user moves any other control, so the result is kept rather than recomputed.
+    """
+    _, x = data.example(row)
+    found = counterfactuals.generate(_pipeline(family, value), x, target)
+    return counterfactuals.as_rows(x, found)
+
+
+@lru_cache(maxsize=64)
+def _effect_curves(family, value, feature):
+    """PDP and both ALE estimates, cached for the same reason. Figures are drawn fresh."""
+    pipeline = _pipeline(family, value)
+    grid = effects.grid_for(feature)
+    edges, finite = effects.ale_finite(pipeline, feature)
+    _, exact = effects.ale_exact(pipeline, feature)
+    return grid, effects.pdp(pipeline, feature, grid), edges, finite, exact
+
+
+def _counterfactual_context(request, family, selected):
     """Section 4, driven by the same model the sections above are showing."""
     frame = data.load()
     try:
@@ -27,45 +61,38 @@ def _counterfactual_context(request, pipeline):
         row = 0
     index, x = data.example(row)
 
-    predicted = pipeline.predict(frame.iloc[[index]][data.FEATURES])[0]
+    predicted = selected["pipeline"].predict(frame.iloc[[index]][data.FEATURES])[0]
     target = request.GET.get("target")
     if target not in data.species():
         target = next(name for name in data.species() if name != predicted)
 
-    found = counterfactuals.generate(pipeline, x, target)
     return {
         "row": index,
+        "row_choices": data.row_choices(),
         "species": data.species(),
         "features": data.FEATURES,
         "target": target,
         "predicted": predicted,
+        "actual": x[data.TARGET],
         "original_cells": [x[feature] for feature in data.FEATURES],
-        "counterfactuals": counterfactuals.as_rows(x, found),
+        "counterfactuals": _counterfactuals_for(family, selected["value"], index, target),
     }
 
 
-def _effects_context(request, pipeline):
+def _effects_context(request, family, selected):
     """Section 5, on the same model again."""
     feature = request.GET.get("feature")
     if feature not in data.NUMERIC_FEATURES:
         feature = data.NUMERIC_FEATURES[0]
 
-    grid = effects.grid_for(feature)
-    pdp_plot = plots.effect_curves(
-        grid, effects.pdp(pipeline, feature, grid), feature,
-        f"Partial dependence on {feature}",
-    )
-
-    edges, finite = effects.ale_finite(pipeline, feature)
-    exact_edges, exact = effects.ale_exact(pipeline, feature)
-    ale_plot = plots.effect_curves(
-        edges, finite, feature, f"Accumulated local effects of {feature}", extra=exact,
-    )
+    grid, pdp, edges, finite, exact = _effect_curves(family, selected["value"], feature)
 
     return {
         "feature": feature,
-        "pdp_plot": pdp_plot,
-        "ale_plot": ale_plot,
+        "pdp_plot": plots.effect_curves(grid, pdp, feature, f"Partial dependence on {feature}"),
+        "ale_plot": plots.effect_curves(
+            edges, finite, feature, f"Accumulated local effects of {feature}", extra=exact
+        ),
         "exact_available": exact is not None,
     }
 
@@ -76,6 +103,7 @@ def index(request):
     selected = training.select(family, lam)
 
     context = {
+        "page_title": PAGE_TITLE,
         "summary": data.summary(),
         "family": family,
         "families": training.FAMILIES.items(),
@@ -99,13 +127,15 @@ def index(request):
         ],
     }
 
-    context.update(_counterfactual_context(request, selected["pipeline"]))
-    context.update(_effects_context(request, selected["pipeline"]))
+    context.update(_counterfactual_context(request, family, selected))
+    context.update(_effects_context(request, family, selected))
 
     if family == "tree":
         context["model_plot"] = plots.decision_tree(selected["pipeline"])
     else:
-        context["model_plot"] = plots.coefficients(selected["pipeline"])
         context["used_features"] = training.used_features(selected["pipeline"])
+        # With no surviving coefficients there is nothing to draw; the template says so.
+        if selected["complexity"]:
+            context["model_plot"] = plots.coefficients(selected["pipeline"])
 
     return render(request, "project2/index.html", context)

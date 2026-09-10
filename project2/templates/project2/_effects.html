@@ -7,7 +7,7 @@
         computed here rather than taken from a library.
     </p>
 
-    <form method="get" class="selector">
+    <form method="get" class="form-grid">
         <input type="hidden" name="family" value="{{ family }}">
         <input type="hidden" name="lam" value="{{ lam }}">
         <input type="hidden" name="row" value="{{ row }}">
@@ -21,13 +21,10 @@
                 {% endfor %}
             </select>
         </div>
-        <div class="field">
-            <label>&nbsp;</label>
-            <noscript><button type="submit">Show</button></noscript>
-        </div>
+        <noscript><div class="field field--actions"><button type="submit">Show</button></div></noscript>
     </form>
 
-    <div class="effects">
+    <div class="figures">
         <figure class="plot">
             <img src="{{ pdp_plot }}" alt="Partial dependence plot">
             <figcaption>
@@ -47,7 +44,7 @@
         </figure>
     </div>
 
-    <p class="derivative-note">
+    <p class="callout">
         {% if exact_available %}
             The dotted overlay is the <strong>exact</strong> derivative: for a multinomial logistic
             model <code>&part;P&#8321;/&part;x&#8332; = P&#8321;(w&#8321;&#8332; &minus; &Sigma;&#8342; P&#8342;w&#8342;&#8332;)</code>,

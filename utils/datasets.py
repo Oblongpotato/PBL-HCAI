@@ -71,6 +71,14 @@ def infer_task(y):
     return "classification" if unique <= 2 else "regression"
 
 
+def _preview_rows(df, rows=10):
+    """The first rows, with gaps shown as a dash rather than as ``nan``."""
+    return [
+        ["—" if pd.isna(cell) else cell for cell in row]
+        for row in df.head(rows).itertuples(index=False, name=None)
+    ]
+
+
 def describe(df, dropped=(), task=None):
     """Summarise a dataset for display: shape, columns, missing values, target profile.
 
@@ -88,7 +96,7 @@ def describe(df, dropped=(), task=None):
         "missing": int(df.isna().sum().sum()),
         "numeric_features": [c for c in X.columns if ptypes.is_numeric_dtype(X[c])],
         "preview_columns": list(df.columns),
-        "preview_rows": df.head(10).values.tolist(),
+        "preview_rows": _preview_rows(df),
     }
     if task == "regression" and ptypes.is_numeric_dtype(y):
         summary["target_range"] = (float(y.min()), float(y.max()), float(y.mean()))

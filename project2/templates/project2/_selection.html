@@ -9,9 +9,9 @@
         &Omega;(f) counts {{ complexity_label }}.
     </p>
 
-    <form method="get" class="selector">
+    <form method="get" class="form-grid">
         <div class="field">
-            <label>Model class</label>
+            <span class="field__label">Model class</span>
             {% for key, label in families %}
                 <label class="radio">
                     <input type="radio" name="family" value="{{ key }}"
@@ -21,22 +21,25 @@
             {% endfor %}
         </div>
 
-        <div class="field grow">
+        <div class="field field--grow">
             <label for="lam">&lambda; = <strong id="lam-value">{{ lam }}</strong></label>
             <input type="range" id="lam" name="lam" min="0" max="{{ lambda_max }}" step="0.001"
                    value="{{ lam }}"
                    oninput="document.getElementById('lam-value').textContent = this.value"
                    onchange="this.form.submit()">
-            <span class="range-ends">0 &mdash; accuracy only &nbsp;&nbsp;&nbsp; {{ lambda_max }} &mdash; simplicity matters most</span>
+            <span class="range-ends">
+                <span>0 &mdash; accuracy only</span>
+                <span>{{ lambda_max }} &mdash; simplicity matters most</span>
+            </span>
         </div>
 
         {% if feature %}<input type="hidden" name="feature" value="{{ feature }}">{% endif %}
         {% if row %}<input type="hidden" name="row" value="{{ row }}">{% endif %}
         {% if target %}<input type="hidden" name="target" value="{{ target }}">{% endif %}
-        <noscript><button type="submit">Apply</button></noscript>
+        <noscript><div class="field field--actions"><button type="submit">Apply</button></div></noscript>
     </form>
 
-    <p class="objective">
+    <p class="callout">
         Selected: <code>{{ fit_regulariser }} = {{ selected.value }}</code> &mdash;
         accuracy {{ selected.accuracy|floatformat:4 }} &minus;
         {{ lam }} &times; {{ selected.complexity }} =
@@ -46,7 +49,7 @@
     <details class="candidates">
         <summary>All {{ candidates|length }} candidate models</summary>
         <div class="table-scroll">
-            <table>
+            <table class="data">
                 <thead>
                     <tr>
                         <th>{{ fit_regulariser }}</th><th>&Omega;(f)</th>
@@ -55,7 +58,7 @@
                 </thead>
                 <tbody>
                     {% for candidate in candidates %}
-                        <tr class="{% if candidate.chosen %}chosen{% endif %}">
+                        <tr class="{% if candidate.chosen %}is-highlight{% endif %}">
                             <td>{{ candidate.value }}</td>
                             <td>{{ candidate.complexity }}</td>
                             <td>{{ candidate.accuracy|floatformat:4 }}</td>
