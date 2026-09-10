@@ -6,36 +6,33 @@
 {% endblock %}
 
 {% block content %}
-<div class="box p1">
-    <div class="title-container">
-        <div class="title">Project 1 &mdash; Supervised Learning Interface</div>
-    </div>
+<p class="lead">
+    Upload a dataset, look at it, then train a model. You stay in charge of the choices that
+    carry meaning &mdash; the problem type, the model, the hyperparameter range, the score.
+    The app automates the mechanical steps and reports every decision it made for you.
+</p>
 
-    <p class="lead">
-        Upload a dataset, look at it, then train a model. You stay in charge of the choices that
-        carry meaning &mdash; the problem type, the model, the hyperparameter range, the score.
-        The app automates the mechanical steps and reports every decision it made for you.
+<section class="panel">
+    <h2>1. Data</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ upload_form.non_field_errors }}
+        <div class="form-grid">
+            {% for field in upload_form %}{% include "field.html" %}{% endfor %}
+            <div class="field field--actions"><button type="submit">Load dataset</button></div>
+        </div>
+    </form>
+    <p class="hint">
+        First row = feature names, last column = target. Identifier columns are filtered out.
     </p>
+</section>
 
-    <section class="panel">
-        <h2>1. Data</h2>
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ upload_form.as_p }}
-            <button type="submit">Load dataset</button>
-        </form>
-        <p class="hint">
-            First row = feature names, last column = target. Identifier columns are filtered out.
-        </p>
-    </section>
+{% if summary %}
+    {% include "project1/_summary.html" %}
+    {% include "project1/_visualize.html" %}
+    {% include "project1/_train.html" %}
+    {% include "project1/_history.html" %}
+{% endif %}
 
-    {% if summary %}
-        {% include "project1/_summary.html" %}
-        {% include "project1/_visualize.html" %}
-        {% include "project1/_train.html" %}
-        {% include "project1/_history.html" %}
-    {% endif %}
-
-    <p class="back"><a href="{% url 'home:index' %}">&larr; Back to the project hub</a></p>
-</div>
+<p class="back"><a href="{% url 'home:index' %}">&larr; Back to the project hub</a></p>
 {% endblock %}

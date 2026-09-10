@@ -7,35 +7,40 @@
         reports what it did.
     </p>
 
-    <table class="models">
-        <thead><tr><th>Model</th><th>Hyperparameter</th><th>Default range</th><th>Trade-off</th></tr></thead>
-        <tbody>
-            {% for spec in model_specs %}
-                <tr>
-                    <td>{{ spec.label }}</td>
-                    <td><code>{{ spec.hyperparameter }}</code></td>
-                    <td>{{ spec.grid|join:", " }}</td>
-                    <td>{{ spec.note }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-scroll">
+        <table class="data">
+            <thead><tr><th>Model</th><th>Hyperparameter</th><th>Default range</th><th>Trade-off</th></tr></thead>
+            <tbody>
+                {% for spec in model_specs %}
+                    <tr>
+                        <td>{{ spec.label }}</td>
+                        <td><code>{{ spec.hyperparameter }}</code></td>
+                        <td>{{ spec.grid|join:", " }}</td>
+                        <td>{{ spec.note }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-    <form method="post" action="{% url 'project1:train' %}" class="inline-form">
+    <form method="post" action="{% url 'project1:train' %}">
         {% csrf_token %}
-        {{ training_form.as_p }}
-        <button type="submit">Train</button>
+        {{ training_form.non_field_errors }}
+        <div class="form-grid">
+            {% for field in training_form %}{% include "field.html" %}{% endfor %}
+            <div class="field field--actions"><button type="submit">Train</button></div>
+        </div>
     </form>
 
     {% if training_error %}
-        <p class="training-error">{{ training_error }}</p>
+        <p class="callout callout--danger">{{ training_error }}</p>
     {% endif %}
 
     {% if result %}
         <div class="result">
             <h3>
                 {{ result.model_label }}
-                {% if result.automated %}<span class="tag auto">chosen automatically</span>
+                {% if result.automated %}<span class="tag tag--auto">chosen automatically</span>
                 {% else %}<span class="tag">your settings</span>{% endif %}
             </h3>
             <p>
@@ -61,7 +66,7 @@
             {% if result.confusion %}
                 <h4>Confusion matrix of the selected model</h4>
                 <div class="table-scroll">
-                    <table class="confusion">
+                    <table class="data is-auto">
                         <thead>
                             <tr><th>true \ predicted</th>{% for label in result.labels %}<th>{{ label }}</th>{% endfor %}</tr>
                         </thead>

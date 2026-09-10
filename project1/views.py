@@ -9,6 +9,7 @@ from .forms import DatasetUploadForm, TrainingForm, VisualizationForm
 from .models import Dataset, TrainingRun
 
 SESSION_KEY = "project1_dataset"
+PAGE_TITLE = "Project 1 — Supervised Learning Interface"
 _TRAINING_FAILED = "This dataset could not be trained on: {error}"
 
 
@@ -43,12 +44,20 @@ def _store(request, upload, task_override):
     return dataset
 
 
-def _context(dataset, frame=None, **extra):
+def _describe(dataset, frame):
+    return datasets.describe(frame, dataset.dropped_columns, task=dataset.task)
+
+
+def _context(dataset, frame=None, summary=None, **extra):
     """Page context: everything the interface shows about the active dataset."""
-    context = {"dataset": dataset, "upload_form": DatasetUploadForm()}
+    context = {
+        "page_title": PAGE_TITLE,
+        "dataset": dataset,
+        "upload_form": DatasetUploadForm(),
+    }
     if dataset:
         frame = dataset.load() if frame is None else frame
-        summary = datasets.describe(frame, dataset.dropped_columns, task=dataset.task)
+        summary = _describe(dataset, frame) if summary is None else summary
         context["summary"] = summary
         context["warnings"] = datasets.quality_warnings(frame, dataset.task)
         context.setdefault("visualization_form", VisualizationForm(summary["numeric_features"]))
@@ -82,8 +91,8 @@ def visualize(request):
         return redirect("project1:index")
 
     frame = dataset.load()
-    numeric = datasets.describe(frame, dataset.dropped_columns)["numeric_features"]
-    form = VisualizationForm(numeric, request.POST)
+    summary = _describe(dataset, frame)
+    form = VisualizationForm(summary["numeric_features"], request.POST)
 
     plot = None
     if form.is_valid():
@@ -103,7 +112,7 @@ def visualize(request):
     return render(
         request,
         "project1/index.html",
-        _context(dataset, frame=frame, visualization_form=form, plot=plot),
+        _context(dataset, frame=frame, summary=summary, visualization_form=form, plot=plot),
     )
 
 

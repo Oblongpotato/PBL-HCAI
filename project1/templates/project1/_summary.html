@@ -20,14 +20,14 @@
     </dl>
 
     {% if warnings %}
-        <div class="warnings">
+        <div class="callout callout--warn">
             <strong>Worth knowing before you trust a score:</strong>
             <ul>{% for warning in warnings %}<li>{{ warning }}</li>{% endfor %}</ul>
         </div>
     {% endif %}
 
     <div class="table-scroll">
-        <table class="preview">
+        <table class="data">
             <thead>
                 <tr>{% for column in summary.preview_columns %}<th>{{ column }}</th>{% endfor %}</tr>
             </thead>

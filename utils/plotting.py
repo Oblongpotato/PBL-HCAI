@@ -16,6 +16,19 @@ from django.conf import settings
 from matplotlib import pyplot as plt
 
 PLOT_SUBDIR = "plots"
+KEEP_PLOTS = 300
+
+
+def _prune(directory, keep=KEEP_PLOTS):
+    """Drop the oldest figures once the directory grows past ``keep``.
+
+    Every page view of projects 1 and 2 writes new PNGs and nothing else ever removes
+    them, so without this the directory grows for as long as the server runs. The files
+    are pure output: anything deleted here is redrawn the next time it is asked for.
+    """
+    figures = sorted(directory.glob("*.png"), key=lambda path: path.stat().st_mtime)
+    for stale in figures[:-keep]:
+        stale.unlink(missing_ok=True)
 
 
 def save_figure(fig, prefix="plot"):
@@ -26,5 +39,6 @@ def save_figure(fig, prefix="plot"):
     filename = f"{prefix}-{uuid.uuid4().hex[:12]}.png"
     fig.savefig(directory / filename, bbox_inches="tight", dpi=110)
     plt.close(fig)
+    _prune(directory)
 
     return f"{settings.MEDIA_URL}{PLOT_SUBDIR}/{filename}"
