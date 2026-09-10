@@ -6,63 +6,60 @@
 {% endblock %}
 
 {% block content %}
-<div class="box p4">
-    <div class="title-container">
-        <div class="title">
-            {% if condition == "pairwise" %}Which would you rather watch?{% else %}Put these in order{% endif %}
-        </div>
-    </div>
+<p class="progress">Block {{ block_number }} &middot; question {{ position }} of {{ total }}</p>
 
-    <p class="progress">Block {{ block_number }} &middot; question {{ position }} of {{ total }}</p>
-
-    {% if is_first_of_block %}
-        <p class="notice">
-            {% if condition == "pairwise" %}
-                For the next few questions you will see two films at a time. Pick the one you would
-                rather watch. There is no right answer; go with your instinct.
-            {% else %}
-                For the next few questions you will see ten films. Give each a position from 1 (most
-                want to watch) to 10 (least). Every position must be used exactly once.
-            {% endif %}
-        </p>
-    {% endif %}
-
-    {% if form.non_field_errors %}
-        <p class="error">{{ form.non_field_errors.0 }}</p>
-    {% endif %}
-
-    <form method="post">
-        {% csrf_token %}
-
+{% if is_first_of_block %}
+    <p class="callout">
         {% if condition == "pairwise" %}
-            <div class="pair">
-                {% for film in films %}
-                    <button type="submit" name="choice" value="{{ film.index }}" class="film-choice">
-                        <span class="film-title">{{ film.title }}</span>
-                        <span class="film-meta">{{ film.year }} &middot; {{ film.duration }} min &middot; {{ film.rating }}</span>
-                        <span class="film-genres">{{ film.genres }}</span>
-                        <span class="film-director">dir. {{ film.director }}</span>
-                    </button>
-                {% endfor %}
-            </div>
+            For the next few questions you will see two films at a time. Pick the one you would
+            rather watch. There is no right answer; go with your instinct.
         {% else %}
-            <table class="ranking">
-                <thead><tr><th>Position</th><th>Film</th></tr></thead>
-                <tbody>
-                    {% for row in rows %}
-                        <tr>
-                            <td class="rank-cell">{{ row.field }}</td>
-                            <td>
-                                <span class="film-title">{{ row.film.title }}</span>
-                                <span class="film-meta">{{ row.film.year }} &middot; {{ row.film.duration }} min &middot; {{ row.film.rating }}</span>
-                                <span class="film-genres">{{ row.film.genres }}</span>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <button type="submit">Submit ranking</button>
+            For the next few questions you will see ten films. Give each a position from 1 (most
+            want to watch) to 10 (least). Every position must be used exactly once.
         {% endif %}
-    </form>
-</div>
+    </p>
+{% endif %}
+
+{% if form.non_field_errors %}
+    <p class="callout callout--danger">{{ form.non_field_errors.0 }}</p>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+
+    {% if condition == "pairwise" %}
+        <div class="pair">
+            {% for film in films %}
+                <button type="submit" name="choice" value="{{ film.index }}" class="film-choice">
+                    <span class="film-title">{{ film.title }}</span>
+                    <span class="film-meta">{{ film.year }} &middot; {{ film.duration }} min &middot; {{ film.rating }}</span>
+                    <span class="film-genres">{{ film.genres }}</span>
+                    <span class="film-director">dir. {{ film.director }}</span>
+                </button>
+            {% endfor %}
+        </div>
+    {% else %}
+        <table class="ranking">
+            <thead><tr><th>Position</th><th>Film</th></tr></thead>
+            <tbody>
+                {% for row in rows %}
+                    <tr>
+                        <td class="rank-cell">
+                            <label class="sr-only" for="{{ row.field.id_for_label }}">
+                                Position for {{ row.film.title }}
+                            </label>
+                            {{ row.field }}
+                        </td>
+                        <td>
+                            <span class="film-title">{{ row.film.title }}</span>
+                            <span class="film-meta">{{ row.film.year }} &middot; {{ row.film.duration }} min &middot; {{ row.film.rating }}</span>
+                            <span class="film-genres">{{ row.film.genres }}</span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit">Submit ranking</button>
+    {% endif %}
+</form>
 {% endblock %}

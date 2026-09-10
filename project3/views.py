@@ -5,6 +5,8 @@ from django.shortcuts import render
 
 from . import experiments, report
 
+PAGE_TITLE = "Project 3 — Learning to Defer"
+
 
 def index(request):
     """Display the precomputed experiment results.
@@ -17,6 +19,7 @@ def index(request):
         request,
         "project3/index.html",
         {
+            "page_title": PAGE_TITLE,
             "results": results,
             "stale": bool(results) and experiments.is_stale(results),
         },

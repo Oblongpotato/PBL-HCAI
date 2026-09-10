@@ -12,13 +12,13 @@
             <h3>{{ expert.label }} &mdash; overall accuracy {{ expert.accuracy }}</h3>
             <p class="hint">{{ expert.description }}</p>
             <div class="table-scroll">
-                <table class="compact">
+                <table class="data">
                     <thead>
                         <tr><th>Topic</th><th>expert</th><th>classifier</th><th>better</th></tr>
                     </thead>
                     <tbody>
                         {% for topic, row in expert.per_topic.items %}
-                            <tr class="{% if row.expert_better %}expert-wins{% endif %}">
+                            <tr class="{% if row.expert_better %}is-positive{% endif %}">
                                 <th>{{ topic }}</th>
                                 <td>{{ row.expert }}</td>
                                 <td>{{ row.classifier }}</td>

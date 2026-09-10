@@ -8,14 +8,16 @@
 
     <p class="headline">Test accuracy: <strong>{{ results.baseline.accuracy }}</strong></p>
 
-    <table class="compact">
-        <thead><tr><th>Topic</th><th>accuracy</th></tr></thead>
-        <tbody>
-            {% for topic, value in results.baseline.per_topic.items %}
-                <tr><th>{{ topic }}</th><td>{{ value }}</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-scroll">
+        <table class="data is-auto">
+            <thead><tr><th>Topic</th><th>accuracy</th></tr></thead>
+            <tbody>
+                {% for topic, value in results.baseline.per_topic.items %}
+                    <tr><th>{{ topic }}</th><td>{{ value }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
     <figure class="plot">
         <img src="{% static results.baseline.confusion_figure %}" alt="Confusion matrix">

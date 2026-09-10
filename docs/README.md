@@ -233,6 +233,57 @@ disagree with the numbers on the page.
 
 ## Project 4 — Preference Elicitation User Study
 
-Not implemented yet. It will cover lecture 9 (Luce models and the Bradley-Terry extension to
-rankings), lecture 7 (study design, between- and within-subjects, piloting, consent) and
-lecture 8 (the study interface).
+App `project4/`, route `/project4/`. A recommender that has never met you has to learn your taste
+from a handful of questions. It could show two films and ask which you prefer, or show ten and ask
+you to put them in order. Which is the better use of the participant's attention is an empirical
+question, and this is the study that would answer it. The design is written up in full; the study
+itself is not run.
+
+The landing page has two doors: download the protocol, or take part. Taking part walks through
+consent, both interfaces, and a results page built from your own answers.
+
+### Lecture 9: Luce models
+
+`project4/preferences.py` extends Bradley-Terry to rankings. Reading a ranking as a sequence of
+choices — pick a favourite from the slate, then from what remains, and so on — and multiplying the
+Luce choice probabilities gives Plackett-Luce. Set n = 2 and it collapses back to a single
+Bradley-Terry factor.
+
+That identity is what makes the study coherent. A pairwise choice and a ten-item ranking are the
+same likelihood at different n, so both interfaces produce evidence about the same weight vector
+and the two conditions can be compared directly instead of through a conversion factor.
+
+Fitting is maximum a posteriori with a Gaussian prior. A participant gives a few dozen comparisons
+for about 45 weights, so the unpenalised likelihood is under-determined and would send weights to
+infinity on any feature nothing contradicted.
+
+### Lecture 7: study design
+
+`project4/study.py` and the report cover the parts a study needs: a within-subjects design so each
+participant serves as their own control, counterbalancing so order effects do not load onto one
+condition, uniform-random slates, and a primary measure of how much was learned per minute of the
+participant's time.
+
+Counterbalancing comes from the parity of the participant's primary key, which the database
+allocates atomically. A `count()` would let two simultaneous consents both read the same number and
+land in the same condition.
+
+Slates are drawn from a generator seeded on the participant's own token, so a session is
+reproducible from the database alone, and the two blocks draw from disjoint pools so no film is
+seen twice.
+
+### Lecture 8: the interface
+
+Pairwise choice is two large cards; ranking is ten numbered dropdowns rather than drag-and-drop,
+because dropdowns need no JavaScript, work with a keyboard and a screen reader, and let a
+participant revise one position without disturbing the others.
+
+The results page is not asked for by the brief, but a fifteen-minute study that gives nothing back
+is one people abandon. It also shows the task 2 model working end to end rather than only in tests.
+
+### Lecture 12: data minimisation
+
+`project4/models.py` stores an opaque token, the orderings, and how long each took. No name, no
+email, no IP address — there is nowhere in the schema for a personal detail to go. The consent page
+says so before the participant starts, and says that anonymity is exactly why data already
+submitted cannot be picked out and withdrawn afterwards.
