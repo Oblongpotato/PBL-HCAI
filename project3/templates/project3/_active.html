@@ -21,9 +21,13 @@
                 <img src="{% static run.figure %}" alt="Accuracy against expert labels collected">
                 <figcaption>
                     {% if run.expert == "specialist" %}
-                        Asking about the right articles matters more than asking about many. Querying
-                        where the classifier is merely unsure is the natural mistake: it finds hard
-                        articles, but says nothing about whether the <em>expert</em> can handle them.
+                        Asking about the right articles matters more than asking about many. The
+                        proposed strategy is ahead for most of the budget; querying where the
+                        classifier is merely unsure finds hard articles but says nothing about
+                        whether the <em>expert</em> can handle them, and it needs roughly twice as
+                        many answers to catch up. The three converge once most of the pool has been
+                        labelled, which is what makes the early part of the curve the interesting
+                        part.
                     {% else %}
                         With an expert who is better nowhere, no query strategy can help: there is no
                         region to discover. The curves sit at or below the classifier's own accuracy,

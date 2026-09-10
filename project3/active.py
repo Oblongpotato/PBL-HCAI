@@ -8,11 +8,12 @@ The thing being learned is the expert's competence profile, so the query strateg
 target the decision that profile feeds: defer or not. That decision is hardest where the two
 parties are closest, so the informativeness term is
 
-    u_info(x) = -| P(expert right | x) - P(classifier right | x) |
+    u_info(x) = 1 - | P(expert right | x) - P(classifier right | x) |
 
 which is largest when the estimated probabilities nearly tie. On its own that happily spends
-the budget on outliers, so following lecture 6 it is combined with a representativeness term,
-the mean similarity of x to the rest of the pool.
+the budget on outliers, so following lecture 6 it is multiplied by a representativeness term,
+the mean similarity of x to the rest of the pool. Both terms are ranked before multiplying;
+see ``query_score`` for why the raw values do not combine.
 
 Two baselines: querying at random, and querying where the classifier is least confident,
 which is the obvious thing to do if you forget that the point is to learn about the *expert*.
@@ -34,6 +35,27 @@ def _density(Z, rng):
     normalised = Z / (np.linalg.norm(Z, axis=1, keepdims=True) + 1e-9)
     anchors = normalised[rng.choice(len(Z), size=min(ANCHORS, len(Z)), replace=False)]
     return (normalised @ anchors.T).mean(axis=1)
+
+
+def _ranks(values):
+    """Positions scaled to [0, 1], so a term contributes its ordering and not its units."""
+    if len(values) < 2:
+        return np.zeros(len(values))
+    positions = np.empty(len(values), dtype=float)
+    positions[np.argsort(values)] = np.arange(len(values))
+    return positions / (len(values) - 1)
+
+
+def query_score(closeness, density):
+    """Lecture 6's information density: informativeness weighted by how typical the article is.
+
+    Both terms have to be non-negative or the product turns round and rewards the outliers the
+    density term is there to suppress. They also have to be comparable: across the pool the
+    informativeness spans almost its whole range while the density spans a factor of five in a
+    narrow band, so multiplying the raw values hands the decision to the density alone. Ranking
+    each term first makes the product a real compromise between the two.
+    """
+    return _ranks(closeness) * _ranks(density)
 
 
 def _competence_model(Z, queried, answers):
@@ -80,8 +102,8 @@ def run_strategy(name, expert_name, seed=SEED):
         else:
             # Only this strategy reads the competence model, so only this branch fits one.
             estimate = _competence_model(Z_train, queried, expert_right_train[queried])
-            closeness = -np.abs(estimate(Z_train[pool]) - p_classifier_train[pool])
-            picks = pool[np.argsort(closeness * density[pool])[-ROUND:]]
+            closeness = 1.0 - np.abs(estimate(Z_train[pool]) - p_classifier_train[pool])
+            picks = pool[np.argsort(query_score(closeness, density[pool]))[-ROUND:]]
 
         queried.extend(int(index) for index in picks)
         available[picks] = False

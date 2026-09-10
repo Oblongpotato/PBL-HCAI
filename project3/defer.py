@@ -122,15 +122,22 @@ def train_css(Z, y, expert_correct, n_classes, kappa=0.0, epochs=EPOCHS, seed=SE
 
 
 def evaluate(defer_mask, class_prediction, expert_prediction, truth):
-    """How good the decisions were, not just how accurate the answers were."""
+    """How good the decisions were, not just how accurate the answers were.
+
+    The brief asks for the quality of the deferral decisions, which is not the same thing as
+    the accuracy of the answers. On most articles both parties agree and the routing cannot
+    matter; scoring the router over all of them just reproduces system accuracy. So routing is
+    scored only where exactly one party was right, which is where the decision had a cost.
+    """
     system = np.where(defer_mask, expert_prediction, class_prediction)
     classifier_right = class_prediction == truth
     expert_right = expert_prediction == truth
-
-    # Deferring was the right call when the expert was right and the classifier was not,
-    # and keeping was right in the mirror case.
-    better_choice = np.where(defer_mask, expert_right, classifier_right)
     ideal = np.maximum(classifier_right, expert_right)
+
+    # Deferring was the right call when the expert was right and the classifier was not, and
+    # keeping was right in the mirror case. Elsewhere either choice gives the same answer.
+    decisive = classifier_right != expert_right
+    routed_well = defer_mask == expert_right
 
     kept = ~defer_mask
     return {
@@ -142,7 +149,10 @@ def evaluate(defer_mask, class_prediction, expert_prediction, truth):
         "expert_accuracy_on_deferred": round(float(expert_right[defer_mask].mean()), 4)
         if defer_mask.any()
         else None,
-        "right_party_chosen": round(float(better_choice.mean()), 4),
+        "routing_accuracy": round(float(routed_well[decisive].mean()), 4)
+        if decisive.any()
+        else None,
+        "decisive_share": round(float(decisive.mean()), 4),
         "oracle_ceiling": round(float(ideal.mean()), 4),
     }
 
@@ -258,13 +268,19 @@ def run(expert_name):
     css = evaluate(defer_mask, class_prediction, expert_prediction, truth)
 
     # Confidence rejection at the same workload: the only fair comparison, since any
-    # strategy looks better if it is allowed to ask the human more often.
-    threshold = np.quantile(confidence, max(css["deferral_rate"], 1e-6))
-    matched = evaluate(confidence < threshold, class_prediction, expert_prediction, truth)
+    # strategy looks better if it is allowed to ask the human more often. When the learned
+    # rule defers nothing there is no budget to match, and forcing a quantile through anyway
+    # hands the baseline a single article and reports statistics computed from it.
+    if css["deferral_rate"] > 0:
+        threshold = float(np.quantile(confidence, css["deferral_rate"]))
+        confidence_mask = confidence < threshold
+        matched = evaluate(confidence_mask, class_prediction, expert_prediction, truth)
+    else:
+        confidence_mask = np.zeros_like(defer_mask)
+        matched = None
 
     # Where each strategy spends its budget. This is the clearest evidence for the lecture's
     # objection: confidence rejection cannot aim, because it never looks at the expert.
-    confidence_mask = confidence < threshold
     by_topic = {
         topic: {
             "css": round(float(defer_mask[truth == code].mean()), 3),
@@ -284,7 +300,6 @@ def run(expert_name):
         "css": css,
         "confidence_matched": matched,
         "deferral_by_topic": by_topic,
-        "loss_history": [round(value, 4) for value in model["history"]],
         "css_curve": css_curve(model, Z_test, expert_name, class_prediction),
         "confidence_curve": confidence_curve(expert_name),
         "baseline_accuracy": round(float((class_prediction == truth).mean()), 4),

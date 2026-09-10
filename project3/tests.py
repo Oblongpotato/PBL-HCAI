@@ -10,7 +10,7 @@ import numpy as np
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from . import data, defer, experiments, experts
+from . import active, data, defer, experiments, experts
 
 
 class DataTests(TestCase):
@@ -95,12 +95,56 @@ class EvaluationTests(TestCase):
         self.assertEqual(result["expert_accuracy_on_deferred"], 0.5)
         self.assertEqual(result["classifier_accuracy_on_kept"], 0.5)
 
+    def test_routing_is_scored_only_where_the_choice_mattered(self):
+        # Four articles. On the first two exactly one party is right, so the routing decides the
+        # outcome; on the last two both are right and it cannot. Deferring nothing keeps the
+        # first article correctly and the second wrongly: one decision of the two right.
+        truth = np.array([0, 0, 0, 0])
+        classifier = np.array([0, 1, 0, 0])
+        expert = np.array([1, 0, 0, 0])
+        result = defer.evaluate(np.zeros(4, dtype=bool), classifier, expert, truth)
+        self.assertEqual(result["decisive_share"], 0.5)
+        self.assertEqual(result["routing_accuracy"], 0.5)
+        # The two must be able to disagree; the old metric was system accuracy renamed.
+        self.assertEqual(result["system_accuracy"], 0.75)
+
+    def test_perfect_routing_scores_one(self):
+        truth = np.array([0, 0])
+        classifier = np.array([1, 0])
+        expert = np.array([0, 1])
+        result = defer.evaluate(np.array([True, False]), classifier, expert, truth)
+        self.assertEqual(result["routing_accuracy"], 1.0)
+        self.assertEqual(result["system_accuracy"], 1.0)
+
     def test_oracle_ceiling_is_never_below_the_system(self):
         truth = np.array([0, 1, 2, 3])
         result = defer.evaluate(
             np.zeros(4, dtype=bool), np.array([0, 1, 0, 0]), np.array([1, 1, 2, 2]), truth
         )
         self.assertGreaterEqual(result["oracle_ceiling"], result["system_accuracy"])
+
+
+class ActiveLearningTests(TestCase):
+    def test_a_typical_article_outscores_an_outlier_of_equal_informativeness(self):
+        # The score used to be a negative informativeness times a positive density, which
+        # silently reversed the representativeness term and chased outliers.
+        closeness = np.array([0.9, 0.9, 0.1])
+        density = np.array([0.02, 0.14, 0.08])
+        scores = active.query_score(closeness, density)
+        self.assertGreater(scores[1], scores[0])
+
+    def test_neither_term_can_be_ignored(self):
+        # Ranking both terms is what stops the one with the wider spread deciding alone.
+        closeness = np.array([0.95, 0.90, 0.10, 0.05])
+        density = np.array([0.03, 0.14, 0.13, 0.02])
+        best = int(np.argmax(active.query_score(closeness, density)))
+        self.assertEqual(best, 1, "the article that scores well on both should win")
+
+    def test_the_score_is_blind_to_the_units_of_either_term(self):
+        closeness = np.array([0.95, 0.90, 0.10, 0.05])
+        density = np.array([0.03, 0.14, 0.13, 0.02])
+        scaled = active.query_score(closeness, density * 1000.0)
+        self.assertTrue(np.allclose(scaled, active.query_score(closeness, density)))
 
 
 class CommittedResultsTests(TestCase):
@@ -134,12 +178,16 @@ class CommittedResultsTests(TestCase):
             max(run["deferral_by_topic"][t]["css"] for t in weak),
         )
 
-    def test_active_learning_beats_random_for_the_specialist(self):
+    def test_active_learning_beats_both_baselines_for_the_specialist(self):
+        # Judged on the area under the learning curve, not the last point: by the end of the
+        # budget every strategy has labelled most of the pool and they converge.
         run = next(r for r in self.results["active"]["runs"] if r["expert"] == "specialist")
-        curves = {s["strategy"]: s["curve"] for s in run["strategies"]}
-        self.assertGreater(
-            curves["proposed"][-1]["system_accuracy"], curves["random"][-1]["system_accuracy"]
-        )
+        area = {
+            s["strategy"]: sum(p["system_accuracy"] for p in s["curve"]) / len(s["curve"])
+            for s in run["strategies"]
+        }
+        self.assertGreater(area["proposed"], area["random"])
+        self.assertGreater(area["proposed"], area["classifier_uncertainty"])
 
     def test_code_hash_ignores_line_endings(self):
         """The stored hash has to survive a clone with different newline settings.
@@ -168,15 +216,16 @@ class CommittedResultsTests(TestCase):
         self.assertEqual(stamp["code_hash"], experiments.code_hash())
         self.assertFalse(experiments.is_stale(self.results))
 
-    def test_chosen_query_cost_is_justified_by_its_grid(self):
-        # Either the optimum is interior, or it sits at kappa >= 1 where deferral is switched
-        # off entirely and extending the grid could not change the answer.
+    def test_chosen_query_cost_is_the_best_in_its_grid(self):
+        # Two ways this goes wrong: the recorded choice disagrees with its own trace, or the
+        # optimum sits at the edge of the grid while deferral is still doing something, which
+        # means the grid was too narrow to bracket it.
         for run in self.results["deferral"]:
-            grid = [row["kappa"] for row in run["kappa_trace"]]
-            self.assertTrue(
-                run["kappa"] != max(grid) or run["kappa"] >= 1.0,
-                f"{run['expert']} selected the grid maximum {run['kappa']}",
-            )
+            trace = run["kappa_trace"]
+            best = max(trace, key=lambda row: row["system_accuracy"])
+            self.assertEqual(run["kappa"], best["kappa"], run["expert"])
+            if run["kappa"] == max(row["kappa"] for row in trace):
+                self.assertEqual(run["css"]["deferral_rate"], 0.0, run["expert"])
 
     def test_a_useless_expert_is_never_consulted(self):
         run = next(r for r in self.results["deferral"] if r["expert"] == "generalist")

@@ -8,6 +8,12 @@
         &ldquo;ask the expert&rdquo; and carries the expert's error as its cost. The class answer
         always comes from the classifier in section 2; only the hand-over decision is learned.
     </p>
+    <p class="hint">
+        <strong>Routing accuracy</strong> scores the decision rather than the answer. On most
+        articles the classifier and the expert agree, so the routing cannot change the outcome and
+        counting those would just reproduce system accuracy. It is measured only on the articles
+        where exactly one of the two was right &mdash; the ones where the choice cost something.
+    </p>
 
     {% for run in results.deferral %}
         <div class="expert">
@@ -22,7 +28,7 @@
                     <thead>
                         <tr>
                             <th></th><th>system accuracy</th><th>deferred</th>
-                            <th>expert accuracy when asked</th><th>right party chosen</th>
+                            <th>expert accuracy when asked</th><th>routing accuracy</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -34,16 +40,18 @@
                             <th>learned deferral</th>
                             <td>{{ run.css.system_accuracy }}</td>
                             <td>{{ run.css.deferral_rate }}</td>
-                            <td>{{ run.css.expert_accuracy_on_deferred }}</td>
-                            <td>{{ run.css.right_party_chosen }}</td>
+                            <td>{{ run.css.expert_accuracy_on_deferred|default_if_none:"&mdash;" }}</td>
+                            <td>{{ run.css.routing_accuracy|default_if_none:"&mdash;" }}</td>
                         </tr>
-                        <tr>
-                            <th>confidence-based, same budget</th>
-                            <td>{{ run.confidence_matched.system_accuracy }}</td>
-                            <td>{{ run.confidence_matched.deferral_rate }}</td>
-                            <td>{{ run.confidence_matched.expert_accuracy_on_deferred }}</td>
-                            <td>{{ run.confidence_matched.right_party_chosen }}</td>
-                        </tr>
+                        {% if run.confidence_matched %}
+                            <tr>
+                                <th>confidence-based, same budget</th>
+                                <td>{{ run.confidence_matched.system_accuracy }}</td>
+                                <td>{{ run.confidence_matched.deferral_rate }}</td>
+                                <td>{{ run.confidence_matched.expert_accuracy_on_deferred|default_if_none:"&mdash;" }}</td>
+                                <td>{{ run.confidence_matched.routing_accuracy|default_if_none:"&mdash;" }}</td>
+                            </tr>
+                        {% endif %}
                         <tr>
                             <th>perfect routing</th>
                             <td>{{ run.css.oracle_ceiling }}</td>
@@ -54,6 +62,11 @@
             </div>
 
             {% if run.css.deferral_rate == 0.0 %}
+                <p class="hint">
+                    There is no confidence-based row here because there is no budget to match: a
+                    strategy that never asks the human cannot be compared against one at the same
+                    workload.
+                </p>
                 <p class="hint">
                     The search settled on the largest query cost in the grid, which switches deferral
                     off. That is the right answer rather than a failure: this expert is better on no
