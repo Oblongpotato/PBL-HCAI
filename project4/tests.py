@@ -10,6 +10,7 @@ from unittest import mock
 
 import numpy as np
 from django.test import TestCase, override_settings
+from django.utils.html import escape
 from django.urls import reverse
 
 from . import data, preferences, study, views
@@ -295,7 +296,10 @@ class InterfaceTests(TestCase):
         body = self.client.get(reverse("project4:task")).content.decode()
         record = ElicitationTask.objects.filter(participant=participant).first()
         for index in record.film_indices:
-            self.assertIn(data.describe(index)["title"], body)
+            # Escaped, because roughly one film title in twenty carries an apostrophe or an
+            # ampersand. Comparing raw titles made this test fail whenever a participant's
+            # randomly drawn slate happened to contain one.
+            self.assertIn(escape(data.describe(index)["title"]), body)
 
     def test_no_template_internals_leak_into_the_page(self):
         # `block` is a Django tag name, so a context variable called `block` renders the
