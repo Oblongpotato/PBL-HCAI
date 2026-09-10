@@ -20,7 +20,7 @@ def build():
     _introduction(doc, summary)
     _task1(doc, summary)
     doc.page_break()
-    _task2(doc)
+    _task2(doc, summary)
     doc.page_break()
     _task3(doc)
     _ethics(doc)
@@ -98,7 +98,7 @@ def _task1(doc, summary):
     )
 
 
-def _task2(doc):
+def _task2(doc, summary):
     doc.heading("3. Task 2 &mdash; from pairwise choice to a ranking")
     doc.paragraph(
         "Bradley-Terry models a single comparison: item i beats item j with probability "
@@ -140,7 +140,7 @@ def _task2(doc):
     doc.paragraph(
         "Estimation is maximum a posteriori with a zero-mean Gaussian prior. This matters more "
         "than it might seem. A participant gives a few dozen comparisons for a vector of "
-        "45 weights, so the unpenalised likelihood is under-determined: any feature that never "
+        f"{summary['n_features']} weights, so the unpenalised likelihood is under-determined: any feature that never "
         "appeared on the losing side would have its weight driven to infinity. The prior keeps the "
         "problem well posed and encodes the reasonable belief that most features matter little to "
         "most people. Optimisation is L-BFGS on the exact gradient, which is checked against "
@@ -184,10 +184,13 @@ def _task3(doc):
         ["Controlled", "Film slates", "uniform random, disjoint between blocks, seeded per participant"],
     ], widths=[95, 130, 235])
     doc.paragraph(
-        "The primary measure needs one more piece: a held-out set. Within each block the last two "
-        "responses are withheld from fitting and used to score the w estimated from the rest, so "
-        "the measure is predictive accuracy on that participant's own later answers rather than "
-        "fit to the data used for training."
+        f"The primary measure needs one more piece: a held-out set. Within each block the last "
+        f"third of the tasks is withheld from fitting and used to score the w estimated from the "
+        f"rest, so the measure is predictive accuracy on that participant's own later answers "
+        f"rather than fit to the data used for training. A third rather than a fixed number of "
+        f"responses, because the blocks hold different numbers of tasks: withholding two "
+        f"responses would leave a single ranking to fit {ranking_tasks} ranking tasks worth of "
+        f"weights from."
     )
 
     doc.heading("4.3 Design", level=2)
@@ -210,9 +213,14 @@ def _task3(doc):
     doc.paragraph(
         f"Each block holds {pairwise_tasks} pairwise tasks or {ranking_tasks} ranking tasks, which "
         f"is {comparisons[0]} and {comparisons[1]} elementary comparisons respectively. The blocks "
-        "are deliberately close in comparison count and not in wall-clock time, since time is the "
-        "thing being measured. Slates are drawn from one disjoint pool per participant, so no film "
-        "is ever seen twice and neither condition can be handed easier material."
+        "are matched on neither wall-clock time nor comparison count, and deliberately so: time is "
+        "half of what is being measured, and holding the evidence equal would fix the numerator "
+        "of the other half. Each block is instead sized to be long enough to fit a preference "
+        "vector and still hold answers back, and short enough that fatigue does not set in. The "
+        "primary measure is a rate, log-likelihood per comparison per minute, so the two blocks "
+        "supplying different amounts of evidence does not bias the comparison. "
+        "Slates are drawn from one disjoint pool per participant, so no film is ever seen twice "
+        "and neither condition can be handed easier material."
     )
 
     doc.heading("4.4 Participants", level=2)

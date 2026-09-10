@@ -6,11 +6,13 @@ recovers a preference vector it was not told. The interface tests walk a whole s
 a participant would.
 """
 
+from unittest import mock
+
 import numpy as np
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from . import data, preferences, study
+from . import data, preferences, study, views
 from .forms import RankingForm
 from .models import PAIRWISE, RANKING, ElicitationTask, Participant, Response
 
@@ -208,6 +210,61 @@ class InterfaceTests(TestCase):
                 payload = {f"rank_{f}": str(i + 1) for i, f in enumerate(films)}
             self.client.post(reverse("project4:task"), payload)
         return participant
+
+    def test_a_session_token_that_is_not_a_uuid_is_discarded(self):
+        # A cookie can outlive a secret-key change or a database reset. The token used to go
+        # straight into the query, where the UUID field raised instead of simply not matching.
+        session = self.client.session
+        session[views.SESSION_KEY] = "not-a-uuid"
+        session.save()
+        self.assertEqual(self.client.get(reverse("project4:task")).status_code, 302)
+
+    def test_consenting_twice_keeps_the_same_session(self):
+        # A second consent used to mint a second participant, strand the first one unfinished
+        # and consume another counterbalancing slot.
+        self.client.post(reverse("project4:consent"), {"consent": "on"})
+        token = self.client.session[views.SESSION_KEY]
+        self.client.post(reverse("project4:consent"), {"consent": "on"})
+        self.assertEqual(self.client.session[views.SESSION_KEY], token)
+        self.assertEqual(Participant.objects.count(), 1)
+
+    def test_answering_the_same_task_twice_is_not_an_error(self):
+        # Response.task is unique, so two submissions racing past the next-step check used to
+        # end in an IntegrityError rather than in the first answer simply winning. Pinning
+        # next_step is what a double-click on a slow connection does: both requests read the
+        # same step before either of them has written.
+        self.client.post(reverse("project4:consent"), {"consent": "on"})
+        self.client.get(reverse("project4:task"))
+        task = ElicitationTask.objects.get()
+        films = task.film_indices
+        payload = (
+            {"choice": str(films[0])}
+            if task.condition == PAIRWISE
+            else {f"rank_{f}": str(i + 1) for i, f in enumerate(films)}
+        )
+        with mock.patch.object(views.study, "next_step", return_value=(task.block, task.position)):
+            first = self.client.post(reverse("project4:task"), payload)
+            second = self.client.post(reverse("project4:task"), payload)
+        self.assertEqual(first.status_code, 302)
+        self.assertEqual(second.status_code, 302)
+        self.assertEqual(Response.objects.filter(task=task).count(), 1)
+
+    def test_a_pairwise_submission_with_no_choice_says_so(self):
+        # Only non-field errors were rendered, and PairwiseForm fails on the field, so pressing
+        # Enter rather than clicking a card redisplayed the page with nothing explaining why.
+        self.client.post(reverse("project4:consent"), {"consent": "on"})
+        while True:
+            response = self.client.get(reverse("project4:task"))
+            pending = ElicitationTask.objects.filter(response__isnull=True).first()
+            if pending.condition == PAIRWISE:
+                break
+            self.client.post(
+                reverse("project4:task"),
+                {f"rank_{f}": str(i + 1) for i, f in enumerate(pending.film_indices)},
+            )
+        body = self.client.post(reverse("project4:task"), {}).content.decode()
+        self.assertEqual(Response.objects.filter(task=pending).count(), 0)
+        self.assertIn("callout--danger", body)
 
     def test_the_ranking_page_offers_one_dropdown_per_film(self):
         # The films rendered but the rank fields did not, because the template tried to match

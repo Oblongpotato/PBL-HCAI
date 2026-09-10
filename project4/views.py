@@ -1,6 +1,8 @@
+import uuid
 from io import BytesIO
 
 import numpy as np
+from django.db import transaction
 from django.http import FileResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
@@ -36,19 +38,16 @@ def report_pdf(request):
 
 def consent(request):
     """Informed consent, and the point at which a participant record is created."""
+    # Someone who has already consented and comes back to this page is mid-session. Minting a
+    # second participant would strand the first one unfinished and burn a counterbalancing
+    # slot, so send them on to where they left off.
+    if _current(request) is not None:
+        return redirect("project4:task")
+
     if request.method == "POST":
         form = ConsentForm(request.POST)
         if form.is_valid():
-            # Alternate who sees which interface first: this is the counterbalancing. The
-            # parity comes from the participant's own primary key, which the database
-            # allocates atomically, rather than from a count() that two simultaneous
-            # consents could both read before either row exists.
-            participant = Participant.objects.create(
-                first_condition=PAIRWISE, consented_at=timezone.now()
-            )
-            if participant.pk % 2 == 0:
-                participant.first_condition = RANKING
-                participant.save(update_fields=["first_condition"])
+            participant = _enrol()
             request.session[SESSION_KEY] = str(participant.token)
             return redirect("project4:task")
     else:
@@ -60,9 +59,39 @@ def consent(request):
     )
 
 
+def _enrol():
+    """Create a participant and assign which interface they see first.
+
+    Alternating rather than randomising keeps the split even. The parity comes from the
+    participant's own primary key, which the database allocates atomically, rather than from a
+    count() that two simultaneous consents could both read before either row exists. Both
+    writes are one transaction, so a failure between them cannot leave the assignment half
+    applied.
+    """
+    with transaction.atomic():
+        participant = Participant.objects.create(
+            first_condition=PAIRWISE, consented_at=timezone.now()
+        )
+        if participant.pk % 2 == 0:
+            participant.first_condition = RANKING
+            participant.save(update_fields=["first_condition"])
+    return participant
+
+
 def _current(request):
+    """The participant this session belongs to, or None.
+
+    A cookie that survives a secret-key change or a database reset can hold anything, and a
+    token the UUID field cannot parse raises rather than simply not matching.
+    """
     token = request.session.get(SESSION_KEY)
-    return Participant.objects.filter(token=token).first() if token else None
+    if not token:
+        return None
+    try:
+        return Participant.objects.filter(token=uuid.UUID(str(token))).first()
+    except ValueError:
+        request.session.pop(SESSION_KEY, None)
+        return None
 
 
 def _bind(condition, films, payload=None):
@@ -107,10 +136,15 @@ def task(request):
         form = _bind(condition, films, request.POST)
         if form.is_valid():
             elapsed = (timezone.now() - record.presented_at).total_seconds() * 1000
-            Response.objects.create(
+            # A double-click or a second tab can get two POSTs past the check above before
+            # either has written. Response.task is unique, so the second insert would be a
+            # 500; treat the answer that arrived first as the answer.
+            Response.objects.get_or_create(
                 task=record,
-                ordering=_ordering_from(condition, form, films),
-                duration_ms=max(int(elapsed), 0),
+                defaults={
+                    "ordering": _ordering_from(condition, form, films),
+                    "duration_ms": max(int(elapsed), 0),
+                },
             )
             if study.next_step(participant) is None:
                 participant.finished_at = timezone.now()
@@ -149,7 +183,7 @@ def task(request):
 def results(request):
     """What the participant's answers imply about their taste.
 
-    Not demanded by the brief, but a twenty-minute study that gives nothing back is one people
+    Not demanded by the brief, but a fifteen-minute study that gives nothing back is one people
     abandon. It also demonstrates the task 2 model working end to end rather than only in tests.
     """
     participant = _current(request)

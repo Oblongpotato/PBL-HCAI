@@ -35,7 +35,7 @@ OTHER_RATING = "Other"
 
 # Films before 1980 are thin on the ground, so they share a bucket rather than each decade
 # getting a column that a participant would rarely see filled.
-DECADES = (1980, 1990, 2000, 2010)
+EARLIEST_DECADE = 1980
 PRE_DECADE = "pre-1980"
 
 
@@ -58,7 +58,7 @@ def catalogue():
 
     frame["title_year"] = frame["title_year"].astype(int)
     frame["decade"] = np.where(
-        frame["title_year"] < 1980,
+        frame["title_year"] < EARLIEST_DECADE,
         PRE_DECADE,
         ((frame["title_year"] // 10) * 10).astype(str),
     )
@@ -81,6 +81,13 @@ def _standardise(values):
 
 
 @lru_cache(maxsize=1)
+@lru_cache(maxsize=1)
+def eras():
+    """Every era bucket present in the catalogue, oldest first."""
+    decades = set(catalogue()["decade"]) - {PRE_DECADE}
+    return (PRE_DECADE, *sorted(decades, key=int))
+
+
 def features():
     """The feature matrix and the name of every column, in order."""
     frame = catalogue()
@@ -90,7 +97,9 @@ def features():
         columns.append(frame["genre_list"].apply(lambda row, g=genre: float(g in row)).to_numpy())
         names.append(f"genre:{genre}")
 
-    for decade in (PRE_DECADE, *(str(d) for d in DECADES)):
+    # Read the decades off the data rather than listing them, so the block stays a true
+    # one-hot if the catalogue is ever refreshed with newer films.
+    for decade in eras():
         columns.append((frame["decade"] == decade).astype(float).to_numpy())
         names.append(f"era:{decade}")
 
@@ -147,6 +156,7 @@ def describe(index):
     }
 
 
+@lru_cache(maxsize=1)
 def summary():
     """Facts about the catalogue, for the landing page and the report."""
     frame = catalogue()

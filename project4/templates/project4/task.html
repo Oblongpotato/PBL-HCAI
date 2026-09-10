@@ -20,8 +20,11 @@
     </p>
 {% endif %}
 
-{% if form.non_field_errors %}
-    <p class="callout callout--danger">{{ form.non_field_errors.0 }}</p>
+{% if form.errors %}
+    <p class="callout callout--danger">
+        {% if form.non_field_errors %}{{ form.non_field_errors.0 }}
+        {% else %}Pick one of the two films to carry on.{% endif %}
+    </p>
 {% endif %}
 
 <form method="post">
