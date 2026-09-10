@@ -1,55 +1,40 @@
 {% extends 'base.html' %}
-
-{%  load static %}
+{% load static %}
 
 {% block extra_css %}
-        <link rel= "stylesheet" href="{% static 'home/style.css'%}">
+<link rel="stylesheet" href="{% static 'home/style.css' %}">
 {% endblock %}
 
 {% block content %}
+<p class="lead">
+    Coursework for <strong>Human-Centric Artificial Intelligence</strong>: four small applications,
+    one per project, each built around a different way of putting a person in the loop.
+</p>
 
-<div class="box">
-    <div class="title-container">
-        <div class = "title">HCAI project hub</div>
-    </div>
+<section class="panel">
+    <h2>Group</h2>
+    <ul class="student-list">
+        {% for student in students %}
+            <li class="student-item">
+                <span class="student-name">{{ student.name }}</span>
+                <span class="student-id">{{ student.matriculation }}</span>
+            </li>
+        {% empty %}
+            <li class="student-item">No students found.</li>
+        {% endfor %}
+    </ul>
+</section>
 
-    <div class="main-text">
-    <div class="summary" >
-        <p class="centered-text">This page serves as the central hub for student 
-        projects developed as part of the <strong>Human-Centric Artificial Intelligence</strong> 
-        course, by the following group:</p>
+<section class="panel">
+    <h2>Projects</h2>
+    <div class="cards">
+        {% for project in projects %}
+            <a class="project-card" href="{% url project.url_name %}">
+                <span class="project-card__number">Project {{ forloop.counter }}</span>
+                <span class="project-card__name">{{ project.name }}</span>
+                <span class="project-card__note">{{ project.note }}</span>
+            </a>
+        {% endfor %}
     </div>
-    
-    <div class="students">
-        <ul class="student-list">
-            {% for student in students %}
-                <li class="student-item">
-                    <span class="student-name">{{ student.name }}</span> –
-                    <span class="student-id">{{ student.matriculation }}</span>
-                </li>
-            {% empty %}
-                <li>No students found.</li>
-            {% endfor %}
-        </ul>
-    </div>
-    
-    
-    <div class="projects">
-        <h2 style="text-align: center;">Projects</h2>
-        <div class="button-container">
-            {% for project in projects %}
-                <form action="{% url project.url_name %}" method="get" style="margin-bottom: 10px;">
-                    {% csrf_token %}
-                    <button type="submit">{{ project.name }}</button>
-                </form>
-            {% endfor %}
-        </div>
-    </div>
-    
-
-</div>
-
+</section>
 {% endblock %}
-
-{% block script %}
-{% endblock script %}
