@@ -9,7 +9,7 @@
 
     {% for expert in results.experts.reports %}
         <div class="expert">
-            <h3>{{ expert.label }} &mdash; overall accuracy {{ expert.accuracy }}</h3>
+            <h3>{{ expert.label }}: overall accuracy {{ expert.accuracy }}</h3>
             <p class="hint">{{ expert.description }}</p>
             <div class="table-scroll">
                 <table class="data">

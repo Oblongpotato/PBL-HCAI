@@ -5,7 +5,7 @@ from django.shortcuts import render
 
 from . import counterfactuals, data, effects, plots, training
 
-PAGE_TITLE = "Project 2 — Explainability"
+PAGE_TITLE = "Project 2: Explainability"
 
 
 def _selection(request):

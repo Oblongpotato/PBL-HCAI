@@ -3,12 +3,12 @@
     <dl class="facts">
         <dt>Dataset</dt>
         <dd>
-            Palmer Penguins &mdash; {{ summary.n_rows }} complete rows of {{ summary.n_total }}
+            Palmer Penguins: {{ summary.n_rows }} complete rows of {{ summary.n_total }}
             ({{ summary.n_dropped }} dropped for missing values), {{ summary.n_test }} held out for testing.
         </dd>
         <dt>Target</dt>
         <dd>
-            {{ summary.target }} &mdash;
+            {{ summary.target }}:
             {% for name, count in summary.distribution.items %}{{ name }} ({{ count }}){% if not forloop.last %}, {% endif %}{% endfor %}
         </dd>
         <dt>Numeric features</dt><dd>{{ summary.numeric_features|join:", " }}</dd>

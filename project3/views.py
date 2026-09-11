@@ -5,7 +5,7 @@ from django.shortcuts import redirect, render
 
 from . import experiments, report
 
-PAGE_TITLE = "Project 3 — Learning to Defer"
+PAGE_TITLE = "Project 3: Learning to Defer"
 
 
 def index(request):

@@ -28,8 +28,8 @@
                    oninput="document.getElementById('lam-value').textContent = this.value"
                    onchange="this.form.submit()">
             <span class="range-ends">
-                <span>0 &mdash; accuracy only</span>
-                <span>{{ lambda_max }} &mdash; simplicity matters most</span>
+                <span>0: accuracy only</span>
+                <span>{{ lambda_max }}: simplicity matters most</span>
             </span>
         </div>
 
@@ -40,7 +40,7 @@
     </form>
 
     <p class="callout">
-        Selected: <code>{{ fit_regulariser }} = {{ selected.value }}</code> &mdash;
+        Selected: <code>{{ fit_regulariser }} = {{ selected.value }}</code>,
         accuracy {{ selected.accuracy|floatformat:4 }} &minus;
         {{ lam }} &times; {{ selected.complexity }} =
         <strong>{{ objective|floatformat:4 }}</strong>
@@ -73,7 +73,7 @@
     <figure class="plot">
         <img src="{{ tradeoff_plot }}" alt="Accuracy against complexity">
         <figcaption>
-            Where the accuracy curve flattens, extra complexity buys nothing &mdash; the region in
+            Where the accuracy curve flattens, extra complexity buys nothing: the region in
             which a simple model is as good as a complicated one.
         </figcaption>
     </figure>

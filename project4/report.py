@@ -15,7 +15,7 @@ def build():
     summary = data.summary()
     doc = Report(
         "Comparing two ways of asking someone what they like",
-        "Human-Centric Artificial Intelligence, group 39, project 4 &mdash; method and study design",
+        "Human-Centric Artificial Intelligence, group 39, project 4: method and study design",
     )
     _introduction(doc, summary)
     _task1(doc, summary)
@@ -55,7 +55,7 @@ def _introduction(doc, summary):
 
 
 def _task1(doc, summary):
-    doc.heading("2. Task 1 &mdash; representing a film")
+    doc.heading("2. Task 1: representing a film")
     doc.paragraph(
         "The preference model is a linear utility, U(x) = w &middot; x, so the feature vector "
         "decides what a preference can be about at all. Two constraints shaped it."
@@ -99,7 +99,7 @@ def _task1(doc, summary):
 
 
 def _task2(doc, summary):
-    doc.heading("3. Task 2 &mdash; from pairwise choice to a ranking")
+    doc.heading("3. Task 2: from pairwise choice to a ranking")
     doc.paragraph(
         "Bradley-Terry models a single comparison: item i beats item j with probability "
         "exp(U_i) / (exp(U_i) + exp(U_j)). One of the two interfaces asks for a ranking of ten "
@@ -152,7 +152,7 @@ def _task3(doc):
     pairwise_tasks, ranking_tasks = TASKS_PER_BLOCK[PAIRWISE], TASKS_PER_BLOCK[RANKING]
     comparisons = pairwise_tasks * (SLATE_SIZE[PAIRWISE] - 1), ranking_tasks * (SLATE_SIZE[RANKING] - 1)
 
-    doc.heading("4. Task 3 &mdash; the study")
+    doc.heading("4. Task 3: the study")
     doc.paragraph(
         "The study compares the two elicitation interfaces. It is designed here; it has not been "
         "conducted."
@@ -284,7 +284,7 @@ def _ethics(doc):
         "compensation; withdrawn sessions are deleted rather than retained anonymously.",
         "<b>Data minimisation.</b> A participant is a random token. No name, no email, no IP "
         "address. What is stored is the film orderings they gave, how long each took, and the "
-        "questionnaire answers &mdash; nothing that identifies a person, and nothing not needed to "
+        "questionnaire answers. Nothing that identifies a person, and nothing not needed to "
         "answer the research question.",
         "<b>Retention.</b> Responses kept for the analysis and a defined period after publication, "
         "then deleted; the schedule stated on the information sheet.",

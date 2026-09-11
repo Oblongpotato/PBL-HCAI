@@ -12,7 +12,7 @@ from .forms import ConsentForm, PairwiseForm, RankingForm
 from .models import PAIRWISE, RANKING, ElicitationTask, Participant, Response
 
 SESSION_KEY = "project4_participant"
-PAGE_TITLE = "Project 4 — Preference Elicitation"
+PAGE_TITLE = "Project 4: Preference Elicitation"
 
 
 def index(request):

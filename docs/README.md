@@ -1,6 +1,6 @@
 # Notes: where the lecture material shows up in the code
 
-One Django project with four apps (`project1`–`project4`), all reachable from the home page
+One Django project with four apps (`project1` to `project4`), all reachable from the home page
 at `/home/`. These notes record, for each project, which lecture material I used and where
 it ended up in the code.
 
@@ -28,7 +28,7 @@ builds its iris frame from `sklearn.datasets.load_iris`, which is the same data.
 
 ---
 
-## Project 1 — Supervised Learning Interface
+## Project 1: Supervised Learning Interface
 
 App `project1/`, route `/project1/`. Upload a CSV, look at it, train a model on it.
 
@@ -109,7 +109,7 @@ the comparison in block 5 possible, and it doubles as a record of what was tried
 
 ---
 
-## Project 2 — Explainability
+## Project 2: Explainability
 
 App `project2/`, route `/project2/`. Palmer Penguins, 333 complete rows out of 344,
 predicting `species` from four measurements plus island, sex and year. 100 rows are held out
@@ -125,7 +125,7 @@ what the assignment asks for.
 Two families are offered, a decision tree and L1-penalised logistic regression. Both are
 fitted at a range of regularisation strengths, and Ω(f) measures how complex the result is:
 leaves for the tree, and the number of original features with a non-zero coefficient for
-logistic regression. The λ slider picks the model maximising `accuracy − λ·Ω(f)`.
+logistic regression. The λ slider picks the model maximising `accuracy - λ*Ω(f)`.
 
 Two different regularisers are involved and the page keeps them apart. `max_leaf_nodes` and
 `C` constrain a model while it is being fitted. λ weighs complexity afterwards, when choosing
@@ -159,7 +159,7 @@ intervals, using only the penguins that fall in each interval, which keeps it us
 features are correlated.
 
 The lecture asks which model has an exact partial derivative. A multinomial logistic model
-does: ∂P_c/∂x_j = P_c(w_cj − Σ_k P_k w_kj), corrected for the standardisation applied before
+does: ∂P_c/∂x_j = P_c(w_cj - Σ_k P_k w_kj), corrected for the standardisation applied before
 fitting. That version is drawn over the finite-difference estimate and the two agree to
 0.0024, which is the check that the derivation is right. A decision tree is piecewise
 constant, so its derivative is zero almost everywhere with jumps at the split thresholds, and
@@ -167,7 +167,7 @@ only the discretised estimate exists for it. The page says which case applies.
 
 ---
 
-## Project 3 — Active Learning for Learning-to-Defer
+## Project 3: Active Learning for Learning-to-Defer
 
 App `project3/`, route `/project3/`. A topic classifier for news articles that can hand an
 article to a human expert instead of answering.
@@ -236,7 +236,7 @@ the part that means anything.
 from `/project3/report/`. It is rendered on request rather than committed, so it cannot
 disagree with the numbers on the page.
 
-## Project 4 — Preference Elicitation User Study
+## Project 4: Preference Elicitation User Study
 
 App `project4/`, route `/project4/`. A recommender that has never met you has to learn your taste
 from a handful of questions. It could show two films and ask which you prefer, or show ten and ask
@@ -250,7 +250,7 @@ consent, both interfaces, and a results page built from your own answers.
 ### Lecture 9: Luce models
 
 `project4/preferences.py` extends Bradley-Terry to rankings. Reading a ranking as a sequence of
-choices — pick a favourite from the slate, then from what remains, and so on — and multiplying the
+choices (pick a favourite from the slate, then from what remains, and so on) and multiplying the
 Luce choice probabilities gives Plackett-Luce. Set n = 2 and it collapses back to a single
 Bradley-Terry factor.
 
@@ -289,6 +289,6 @@ is one people abandon. It also shows the task 2 model working end to end rather 
 ### Lecture 12: data minimisation
 
 `project4/models.py` stores an opaque token, the orderings, and how long each took. No name, no
-email, no IP address — there is nowhere in the schema for a personal detail to go. The consent page
+email, no IP address. There is nowhere in the schema for a personal detail to go. The consent page
 says so before the participant starts, and says that anonymity is exactly why data already
 submitted cannot be picked out and withdrawn afterwards.

@@ -2,7 +2,7 @@
 
 Both briefs ask for a report that describes the experiments, justifies the design choices and
 is downloadable from the project page. This wraps reportlab so those modules can write a
-document — headings, paragraphs, tables, figures — instead of positioning things on a page.
+document (headings, paragraphs, tables, figures) instead of positioning things on a page.
 
 Reports are rendered on demand into memory rather than committed. A committed PDF is another
 build artefact that silently drifts from the results it describes.
