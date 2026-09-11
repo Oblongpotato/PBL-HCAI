@@ -49,7 +49,7 @@ def build():
     stamp = results["generated"]
     doc = Report(
         "Active Learning for Learning-to-Defer",
-        f"Human-Centric Artificial Intelligence, project 3 &mdash; "
+        f"Human-Centric Artificial Intelligence, group 39, project 3 &mdash; "
         f"results generated {stamp['utc']} from commit {stamp['git_sha']}",
     )
 
