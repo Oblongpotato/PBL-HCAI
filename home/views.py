@@ -1,6 +1,8 @@
 from django.shortcuts import render
 
-# Group members shown on the home page (task 1: defined in python, not in the template).
+# Group identity shown on the home page (task 1: defined in python, not in the template).
+GROUP = "39"
+
 STUDENTS = [
     {"name": "Sahil Sajwan", "matriculation": "674409"},
 ]
@@ -33,5 +35,10 @@ def index(request):
     return render(
         request,
         "home/index.html",
-        {"students": STUDENTS, "projects": PROJECTS, "page_title": "Project hub"},
+        {
+            "group": GROUP,
+            "students": STUDENTS,
+            "projects": PROJECTS,
+            "page_title": "Project hub",
+        },
     )

@@ -3,7 +3,7 @@
 Coursework for the HCAI module. One Django project holding four apps, one per project, all
 reachable from a hub page at `/home/`.
 
-Sahil Sajwan — 674409
+Group 39 — Sahil Sajwan, 674409
 
 ## The four projects
 

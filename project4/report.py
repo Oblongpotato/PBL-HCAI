@@ -15,7 +15,7 @@ def build():
     summary = data.summary()
     doc = Report(
         "Comparing two ways of asking someone what they like",
-        "Human-Centric Artificial Intelligence, project 4 &mdash; method and study design",
+        "Human-Centric Artificial Intelligence, group 39, project 4 &mdash; method and study design",
     )
     _introduction(doc, summary)
     _task1(doc, summary)
