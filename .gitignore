@@ -173,15 +173,11 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-# user files to ignore
+# Course material, kept out of the repository
 Resources
-context.md
-instructions.md
-# Generated media
+
+# Generated at runtime
 media/plots/
 media/uploads/
 media/myplot.png
-
-# Agent tooling and private uploads
-.claude/
 private_uploads/
