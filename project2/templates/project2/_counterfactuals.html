@@ -5,7 +5,7 @@
         What would have to be different about this penguin for the model to call it something
         else? Candidates are sampled around it, kept only if
         <strong>{{ family_label|lower }} at &lambda;&nbsp;=&nbsp;{{ lam }}</strong> predicts the
-        target, then ranked by MAD-weighted L1 distance &mdash; each feature measured against its
+        target, then ranked by MAD-weighted L1 distance, with each feature measured against its
         own spread, so millimetres and grams are comparable. Every candidate stays inside the range
         the dataset actually covers.
     </p>

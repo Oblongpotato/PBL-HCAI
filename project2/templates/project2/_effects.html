@@ -28,7 +28,7 @@
         <figure class="plot">
             <img src="{{ pdp_plot }}" alt="Partial dependence plot">
             <figcaption>
-                <strong>PDP</strong> &mdash; the average prediction when every penguin is given this
+                <strong>PDP</strong>: the average prediction when every penguin is given this
                 value of {{ feature }}. It marginalises the other features, so it probes the model
                 with combinations that may not exist in reality.
             </figcaption>
@@ -37,7 +37,7 @@
         <figure class="plot">
             <img src="{{ ale_plot }}" alt="Accumulated local effects plot">
             <figcaption>
-                <strong>ALE</strong> &mdash; local differences accumulated across intervals, using
+                <strong>ALE</strong>: local differences accumulated across intervals, using
                 only penguins that really occur in each interval. Immune to the correlation between
                 bill, flipper and mass that makes the PDP unreliable here.
             </figcaption>
@@ -53,7 +53,7 @@
         {% else %}
             A decision tree is piecewise constant: its derivative is zero almost everywhere, with
             jumps at the split thresholds. There is no exact derivative to integrate, so ALE for a
-            tree must be estimated by discretisation &mdash; which is exactly the difference the
+            tree must be estimated by discretisation, which is exactly the difference the
             project asks about.
         {% endif %}
     </p>

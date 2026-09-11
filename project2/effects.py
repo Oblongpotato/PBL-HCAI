@@ -3,8 +3,8 @@
 PDP marginalises the other features; ALE accumulates *local* differences and so stays
 honest when features are correlated, which on this dataset they very much are.
 
-The lecture's question — for which model can the partial derivative be computed exactly?
-— is answered by ``ale_exact``: a multinomial logistic model has a closed-form derivative,
+The lecture asks for which model the partial derivative can be computed exactly. That is
+answered by ``ale_exact``: a multinomial logistic model has a closed-form derivative,
 whereas a decision tree is piecewise constant, its derivative zero almost everywhere with
 jumps at the split thresholds, so only the discretised estimate exists for it.
 """

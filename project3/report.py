@@ -44,12 +44,12 @@ def build():
     """Render the report and return PDF bytes."""
     results = experiments.load()
     if results is None:
-        raise FileNotFoundError("No results yet — run `manage.py run_project3` first.")
+        raise FileNotFoundError("No results yet, run `manage.py run_project3` first.")
 
     stamp = results["generated"]
     doc = Report(
         "Active Learning for Learning-to-Defer",
-        f"Human-Centric Artificial Intelligence, group 39, project 3 &mdash; "
+        f"Human-Centric Artificial Intelligence, group 39, project 3, "
         f"results generated {stamp['utc']} from commit {stamp['git_sha']}",
     )
 
@@ -98,7 +98,7 @@ def _introduction(doc, results):
 
 def _task1(doc, results):
     baseline = results["baseline"]
-    doc.heading("2. Task 1 — the classifier on its own")
+    doc.heading("2. Task 1: the classifier on its own")
     doc.paragraph(
         "Multinomial logistic regression over the TF-IDF features, trained on every available "
         f"label. It reaches <b>{baseline['accuracy']}</b> accuracy on the held-out test set. This "
@@ -118,7 +118,7 @@ def _task1(doc, results):
 
 
 def _task2(doc, results):
-    doc.heading("3. Task 2 — the simulated experts")
+    doc.heading("3. Task 2: the simulated experts")
     doc.paragraph(
         "An expert is modelled as a distribution over the label they would give, conditioned on the "
         "true topic: they answer correctly with a probability that depends on the topic, and "
@@ -153,7 +153,7 @@ def _task2(doc, results):
 
 
 def _task3(doc, results):
-    doc.heading("4. Task 3 — learning to defer")
+    doc.heading("4. Task 3: learning to defer")
     doc.paragraph(
         "Lecture 5 opens with confidence-based rejection: defer whenever the classifier's own "
         "certainty falls below a threshold. It is the natural first idea and it has a specific "
@@ -249,7 +249,7 @@ def _task3(doc, results):
 
 
 def _task4(doc, results):
-    doc.heading("5. Task 4 — discovering the expert's competence")
+    doc.heading("5. Task 4: discovering the expert's competence")
     specialist = _active_run(results, "specialist")
     doc.paragraph(
         "Task 3 assumed we already knew, for every training article, whether the expert would have "
@@ -270,7 +270,7 @@ def _task4(doc, results):
         "On its own that spends the budget on outliers, so following lecture 6 it is multiplied by "
         "a representativeness term, the mean similarity of the article to the rest of the pool. "
         "Two baselines are run against it: querying uniformly at random, and querying where the "
-        "classifier is least confident. The second is the natural mistake — it finds genuinely hard "
+        "classifier is least confident. The second is the natural mistake: it finds genuinely hard "
         "articles, but says nothing about whether the <i>expert</i> can handle them."
     )
 
@@ -302,7 +302,7 @@ def _task4(doc, results):
     doc.paragraph(
         f"Estimated from {specialist['budget']} answers, against the profile the expert was "
         "actually configured with. The absolute values drift, but the split between strong and weak "
-        "topics — which is all the deferral decision depends on — comes through clearly."
+        "topics, which is all the deferral decision depends on, comes through clearly."
     )
     doc.table(
         [["Topic", "Estimated competence", "Actual"]]
@@ -322,7 +322,7 @@ def _limitations(doc, results):
         f"hiding. The query-cost search selects kappa = {generalist['kappa']}, the point at which "
         f"deferral is switched off, and the system defers "
         f"{_percent(generalist['css']['deferral_rate'])} of articles, landing at "
-        f"{generalist['css']['system_accuracy']} — the classifier's own accuracy."
+        f"{generalist['css']['system_accuracy']}, the classifier's own accuracy."
     )
     doc.paragraph(
         "That is the correct answer, not a failure. This expert is better on no topic, so there is "

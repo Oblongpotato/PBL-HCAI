@@ -9,7 +9,7 @@ from .forms import DatasetUploadForm, TrainingForm, VisualizationForm
 from .models import Dataset, TrainingRun
 
 SESSION_KEY = "project1_dataset"
-PAGE_TITLE = "Project 1 — Supervised Learning Interface"
+PAGE_TITLE = "Project 1: Supervised Learning Interface"
 _TRAINING_FAILED = "This dataset could not be trained on: {error}"
 
 

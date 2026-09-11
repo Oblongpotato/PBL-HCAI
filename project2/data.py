@@ -77,7 +77,7 @@ def row_choices():
     return [
         (
             index,
-            f"{index} — {row.species}, {row.island}, "
+            f"{index}: {row.species}, {row.island}, "
             f"bill {row.bill_length_mm:.0f} mm, {row.body_mass_g:.0f} g",
         )
         for index, row in enumerate(load().itertuples(index=False))
